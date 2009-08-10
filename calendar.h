@@ -1,3 +1,5 @@
+#include <QHttp>
+
 #ifndef CALENDAR_H
 #define CALENDAR_H
 
@@ -23,7 +25,7 @@ public slots:
 
 private:
 	QTableWidget *m_list;
-	QHttp *m_http;
+	QHttp m_http;
 };
 
 #endif // CALENDAR_H

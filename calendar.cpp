@@ -15,7 +15,6 @@ Calendar::Calendar(QWidget *parent)
 	: QMainWindow(parent)
 {
 	m_list = new QTableWidget(0, 2);
-	m_http = new QHttp();
 
 	m_list->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -28,7 +27,7 @@ Calendar::Calendar(QWidget *parent)
 	m_list->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
 	m_list->verticalHeader()->hide();
 
-	initNetwork();
+	//initNetwork();
 	getData();
 
 	setCentralWidget(m_list);
@@ -40,11 +39,14 @@ Calendar::~Calendar()
 
 void Calendar::populateList()
 {
-	QString response(m_http->readAll());
+	qDebug() << "Bytes available: " << m_http.bytesAvailable();
+
+	QString response(m_http.readAll());
+
+	//qDebug() << response;
 
 	VCalParser *parser = new VCalParser(response);
 	//QList items = new QAppointment::readVCalendarData(response, response.length());
-	//qDebug() << items;
 
 	for (int i = 0; i < parser->m_events.size(); i++) {
 
@@ -58,21 +60,22 @@ void Calendar::populateList()
 
 		m_list->setItem(row, 0, item1);
 		m_list->setItem(row, 1, item2);
+
 	}
 }
 
 void Calendar::getData()
 {
-	m_http->setHost("aristoteles.serveftp.org");
-	m_http->setUser("florian", "Apfelkuchen12");
+	m_http.setHost("aristoteles.serveftp.org");
+	m_http.setUser("florian", "Apfelkuchen12");
 
 	qDebug() << "fetching data...";
 
-	m_http->get("calendar/icalclient.php");
-	connect(m_http, SIGNAL(done(bool)), this, SLOT(populateList()));
+	m_http.get("/calendar/icalclient.php");
+	connect(&m_http, SIGNAL(done(bool)), this, SLOT(populateList()));
 }
 
 void Calendar::initNetwork()
 {
-	m_http->setProxy("proxy.bmlv.gv.at", 3128, "", "");
+	m_http.setProxy("proxy.bmlv.gv.at", 3128, "", "");
 }

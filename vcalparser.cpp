@@ -63,11 +63,9 @@ void VCalParser::getEvents()
 		event.setDescription(eventList.at(i)["DESCRIPTION"]);
 		event.setSummary(eventList.at(i)["SUMMARY"]);
 		if (eventList.at(i)["DTSTART"].size() > 1) {
-			//qDebug() << " DATETIME: " << .toString("yyyy-MM-dd, hh:mm:ss");
+			//qDebug() << " DATETIME: " << decodeDate(eventList.at(i)["DTSTART"]).toString("yyyy-MM-dd, hh:mm:ss");
 			event.setStart(decodeDate(eventList.at(i)["DTSTART"]));
 		}
-
-		event.setStart();
 		event.setEnd();
 		// qDebug() << event.toString();
 
