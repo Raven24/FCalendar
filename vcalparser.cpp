@@ -62,10 +62,32 @@ void VCalParser::getEvents()
 
 		event.setDescription(eventList.at(i)["DESCRIPTION"]);
 		event.setSummary(eventList.at(i)["SUMMARY"]);
+		if (eventList.at(i)["DTSTART"].size() > 1) {
+			//qDebug() << " DATETIME: " << .toString("yyyy-MM-dd, hh:mm:ss");
+			event.setStart(decodeDate(eventList.at(i)["DTSTART"]));
+		}
+
 		event.setStart();
 		event.setEnd();
 		// qDebug() << event.toString();
 
 		m_events.append(event);
 	}
+}
+
+QDateTime VCalParser::decodeDate(QString date)
+{
+	QStringList splitted = date.split("T");
+	int year	= splitted.at(0).mid(0, 4).toInt();
+	int month	= splitted.at(0).mid(4, 2).toInt();
+	int day		= splitted.at(0).mid(6, 2).toInt();
+	int hours	= splitted.at(1).mid(0, 2).toInt();
+	int mins	= splitted.at(1).mid(2, 2).toInt();
+	int secs	= splitted.at(1).mid(4, 2).toInt();
+
+	QDateTime retVal;
+	retVal.setDate(QDate(year, month, day));
+	retVal.setTime(QTime(hours, mins, secs, 0));
+
+	return retVal;
 }

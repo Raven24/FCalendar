@@ -78,6 +78,7 @@
     <value type="QString" >KDE_SESSION_UID=1000</value>
     <value type="QString" >KDE_SESSION_VERSION=4</value>
     <value type="QString" >LANG=de_AT.UTF-8</value>
+    <value type="QString" >LANGUAGE=</value>
     <value type="QString" >LD_LIBRARY_PATH=/usr/lib/qtcreator:</value>
     <value type="QString" >LOGNAME=gwd</value>
     <value type="QString" >PATH=/usr/bin:/home/gwd/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
@@ -99,7 +100,7 @@
     <value type="QString" >http_proxy=http://proxy.bmlv.gv.at:3128/</value>
    </valuelist>
    <valuelist key="abstractProcess.arguments" type="QVariantList" >
-    <value type="QString" >/home/gwd/Calendar/Calendar.pro</value>
+    <value type="QString" >/home/gwd/src/svn/Calendar/Calendar.pro</value>
     <value type="QString" >-spec</value>
     <value type="QString" >/usr/share/qt4/mkspecs/linux-g++</value>
     <value type="QString" >-r</value>
@@ -107,7 +108,7 @@
    </valuelist>
    <value key="abstractProcess.command" type="QString" >/usr/bin/qmake-qt4</value>
    <value key="abstractProcess.enabled" type="bool" >false</value>
-   <value key="abstractProcess.workingDirectory" type="QString" >/home/gwd/Calendar</value>
+   <value key="abstractProcess.workingDirectory" type="QString" >/home/gwd/src/svn/Calendar</value>
    <value key="buildConfiguration" type="int" >2</value>
   </valuemap>
  </data>
@@ -132,6 +133,7 @@
     <value type="QString" >KDE_SESSION_UID=1000</value>
     <value type="QString" >KDE_SESSION_VERSION=4</value>
     <value type="QString" >LANG=de_AT.UTF-8</value>
+    <value type="QString" >LANGUAGE=</value>
     <value type="QString" >LD_LIBRARY_PATH=/usr/lib/qtcreator:</value>
     <value type="QString" >LOGNAME=gwd</value>
     <value type="QString" >PATH=/usr/bin:/home/gwd/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
@@ -157,7 +159,7 @@
    </valuelist>
    <value key="abstractProcess.command" type="QString" >/usr/bin/make</value>
    <value key="abstractProcess.enabled" type="bool" >true</value>
-   <value key="abstractProcess.workingDirectory" type="QString" >/home/gwd/Calendar</value>
+   <value key="abstractProcess.workingDirectory" type="QString" >/home/gwd/src/svn/Calendar</value>
   </valuemap>
  </data>
  <data>

@@ -43,16 +43,15 @@ void Calendar::populateList()
 	QString response(m_http->readAll());
 
 	VCalParser *parser = new VCalParser(response);
-	TEvent *event;
 	//QList items = new QAppointment::readVCalendarData(response, response.length());
 	//qDebug() << items;
 
 	for (int i = 0; i < parser->m_events.size(); i++) {
 
-		TEvent event = new TEvenet(&parser->m_events.at(i));
+		TEvent event = parser->m_events.at(i);
 
-		QTableWidgetItem *item1 = new QTableWidgetItem(event->getDescription(), 0);
-		QTableWidgetItem *item2 = new QTableWidgetItem(event->getRemaining(), 0);
+		QTableWidgetItem *item1 = new QTableWidgetItem(event.getDescription(), 0);
+		QTableWidgetItem *item2 = new QTableWidgetItem(event.getRemaining(), 0);
 
 		int row = m_list->rowCount();
 		m_list->insertRow(row);

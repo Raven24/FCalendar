@@ -10,7 +10,6 @@ class TEvent : public Task
 {
 public:
     TEvent();
-	TEvent(const TEvent &event);
 
 	void setStart();
 	void setEnd();

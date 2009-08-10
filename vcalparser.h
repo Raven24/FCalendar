@@ -1,5 +1,7 @@
 #include <QList>
 #include <QMap>
+#include <QDateTime>
+#include <QString>
 
 #ifndef VCALPARSER_H
 #define VCALPARSER_H
@@ -19,6 +21,7 @@ public:
 	void getEvents();
 	QList<TEvent> m_events;
 	QList<TTodo> m_todos;
+	QDateTime decodeDate(QString date);
 private:
 	QList<QMap <QString, QString> > split();
 	QList<QMap <QString, QString> > split(QString type);
