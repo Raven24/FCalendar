@@ -19,9 +19,12 @@ public:
 	VCalParser(QString &vcaldata);
 
 	void getEvents();
+	void getTodos();
+
 	QList<TEvent> m_events;
 	QList<TTodo> m_todos;
 	QDateTime decodeDate(QString date);
+
 private:
 	QList<QMap <QString, QString> > split();
 	QList<QMap <QString, QString> > split(QString type);

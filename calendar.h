@@ -1,4 +1,5 @@
 #include <QHttp>
+#include <QTabWidget>
 
 #ifndef CALENDAR_H
 #define CALENDAR_H
@@ -24,7 +25,9 @@ public slots:
 	void populateList();
 
 private:
-	QTableWidget *m_list;
+	QTableWidget *m_events;
+	QTableWidget *m_todos;
+	QTabWidget *m_tabs;
 	QHttp m_http;
 };
 

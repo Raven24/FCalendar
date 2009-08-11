@@ -17,6 +17,7 @@ VCalParser::VCalParser(QString &vcaldata)
 {
 	m_rawData = new QString(vcaldata);
 	getEvents();
+	getTodos();
 }
 
 QList<QMap <QString, QString> > VCalParser::split()
@@ -52,7 +53,7 @@ QList<QMap <QString, QString> > VCalParser::split(QString type)
 
 void VCalParser::getEvents()
 {
-	qDebug() << "parsing calendar...";
+	qDebug() << "parsing calendar (events) ...";
 
 	QList<QMap<QString, QString> > eventList = split("VEVENT");
 
@@ -65,6 +66,8 @@ void VCalParser::getEvents()
 		if (eventList.at(i)["DTSTART"].size() > 1) {
 			//qDebug() << " DATETIME: " << decodeDate(eventList.at(i)["DTSTART"]).toString("yyyy-MM-dd, hh:mm:ss");
 			event.setStart(decodeDate(eventList.at(i)["DTSTART"]));
+		} else if (eventList.at(i)["DTSTART;VALUE=DATE"].size() > 1) {
+			event.setStart(decodeDate(eventList.at(i)["DTSTART;VALUE=DATE"]));
 		}
 		event.setEnd();
 		// qDebug() << event.toString();
@@ -73,8 +76,34 @@ void VCalParser::getEvents()
 	}
 }
 
+void VCalParser::getTodos()
+{
+	qDebug() << "parsing calendar (todos) ...";
+	QList<QMap<QString, QString> > todoList = split("VTODO");
+	TTodo todo;
+
+	for (int i = 0; i < todoList.size(); i++) {
+		todo.setDescription(todoList.at(i)["DESCRIPTION"]);
+		todo.setSummary(todoList.at(i)["SUMMARY"]);
+		todo.setPercentComplete(todoList.at(i)["PERCENT-COMPLETE"].toInt());
+
+		m_todos.append(todo);
+	}
+}
+
 QDateTime VCalParser::decodeDate(QString date)
 {
+	if (date.size() < 9) {
+		int year	= date.mid(0, 4).toInt();
+		int month	= date.mid(4, 2).toInt();
+		int day		= date.mid(6, 2).toInt();
+
+		QDateTime retVal;
+		retVal.setDate(QDate(year, month, day));
+
+		return retVal;
+	}
+
 	QStringList splitted = date.split("T");
 	int year	= splitted.at(0).mid(0, 4).toInt();
 	int month	= splitted.at(0).mid(4, 2).toInt();

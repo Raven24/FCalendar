@@ -10,27 +10,44 @@
 #include <QString>
 #include <QHttp>
 #include <QDebug>
+#include <QVBoxLayout>
+#include <QTabWidget>
 
 Calendar::Calendar(QWidget *parent)
 	: QMainWindow(parent)
 {
-	m_list = new QTableWidget(0, 2);
+	m_events = new QTableWidget(0, 2);
+	m_todos = new QTableWidget(0, 1);
 
-	m_list->setSelectionMode(QAbstractItemView::SingleSelection);
-	m_list->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_events->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_events->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-	QStringList listLabels;
+	m_todos->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_todos->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	// headers
-	listLabels << tr("Name") << tr("Time");
-	m_list->setHorizontalHeaderLabels(listLabels);
-	m_list->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
-	m_list->verticalHeader()->hide();
+	QStringList eventLabels;
+	QStringList todoLabels;
 
-	//initNetwork();
+	eventLabels << tr("Name") << tr("Time");
+	todoLabels << tr("Todo");
+	m_events->setHorizontalHeaderLabels(eventLabels);
+	m_events->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+	m_events->verticalHeader()->hide();
+
+	m_todos->setHorizontalHeaderLabels(todoLabels);
+	m_todos->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+	m_todos->verticalHeader()->hide();
+
+	// tab bar
+	m_tabs = new QTabWidget();
+	m_tabs->addTab(m_events, tr("Events"));
+	m_tabs->addTab(m_todos, tr("Todos"));
+
+	initNetwork();
 	getData();
 
-	setCentralWidget(m_list);
+	setCentralWidget(m_tabs);
 }
 
 Calendar::~Calendar()
@@ -39,14 +56,15 @@ Calendar::~Calendar()
 
 void Calendar::populateList()
 {
-	qDebug() << "Bytes available: " << m_http.bytesAvailable();
+	qDebug() << "received bytes: " << m_http.bytesAvailable();
 
 	QString response(m_http.readAll());
 
 	//qDebug() << response;
 
 	VCalParser *parser = new VCalParser(response);
-	//QList items = new QAppointment::readVCalendarData(response, response.length());
+
+	qDebug() << "populating list ...";
 
 	for (int i = 0; i < parser->m_events.size(); i++) {
 
@@ -55,11 +73,21 @@ void Calendar::populateList()
 		QTableWidgetItem *item1 = new QTableWidgetItem(event.getDescription(), 0);
 		QTableWidgetItem *item2 = new QTableWidgetItem(event.getRemaining(), 0);
 
-		int row = m_list->rowCount();
-		m_list->insertRow(row);
+		int row = m_events->rowCount();
+		m_events->insertRow(row);
 
-		m_list->setItem(row, 0, item1);
-		m_list->setItem(row, 1, item2);
+		m_events->setItem(row, 0, item1);
+		m_events->setItem(row, 1, item2);
+
+	}
+
+	for (int j = 0; j < parser->m_todos.size(); j++) {
+		TTodo todo =parser->m_todos.at(j);
+
+		QTableWidgetItem *item1 = new QTableWidgetItem(todo.getSummary(), 0);
+		int row = m_todos->rowCount();
+		m_todos->insertRow(row);
+		m_todos->setItem(row, 0, item1);
 
 	}
 }
