@@ -19,6 +19,7 @@ public:
 	QDateTime	getStart();
 	QDateTime	getEnd();
 	QString		getRemaining();
+	QString		toString();
 
 private:
 	QDateTime m_start;

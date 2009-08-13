@@ -1,5 +1,7 @@
 #include "task.h"
 
+#include <QString>
+
 #ifndef TTODO_H
 #define TTODO_H
 
@@ -15,6 +17,7 @@ public:
 
 	int getPercentComplete();
 	bool isComplete();
+	QString toString();
 
 private:
 	int m_complete;

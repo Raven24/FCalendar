@@ -10,7 +10,6 @@
 #include <QString>
 #include <QHttp>
 #include <QDebug>
-#include <QVBoxLayout>
 #include <QTabWidget>
 
 Calendar::Calendar(QWidget *parent)
@@ -18,6 +17,10 @@ Calendar::Calendar(QWidget *parent)
 {
 	m_events = new QTableWidget(0, 2);
 	m_todos = new QTableWidget(0, 1);
+
+	//connect signals
+	connect(m_events, SIGNAL(cellClicked(int,int)), this, SLOT(showEventInfo(int, int)));
+	connect(m_todos, SIGNAL(cellClicked(int,int)), this, SLOT(showTodoInfo(int, int)));
 
 	m_events->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_events->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -62,7 +65,7 @@ void Calendar::populateList()
 
 	//qDebug() << response;
 
-	VCalParser *parser = new VCalParser(response);
+	parser = new VCalParser(response);
 
 	qDebug() << "populating list ...";
 
@@ -106,4 +109,16 @@ void Calendar::getData()
 void Calendar::initNetwork()
 {
 	m_http.setProxy("proxy.bmlv.gv.at", 3128, "", "");
+}
+
+void Calendar::showEventInfo(int row, int col)
+{
+	TEvent evt = parser->m_events.value(row);
+	qDebug() << evt.toString();
+}
+
+void Calendar::showTodoInfo(int row, int col)
+{
+	TTodo todo = parser->m_todos.value(row);
+	qDebug() << todo.toString();
 }

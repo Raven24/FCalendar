@@ -88,3 +88,12 @@ QString TEvent::getRemaining()
 
 	return out;
 }
+
+QString TEvent::toString()
+{
+	QString out = Task::toString();
+	QString evtOut = QString("\n\tStart: %1\n\tEnd: %2\n\tRemaining: %3")
+					 .arg(m_start.toString(), m_end.toString(), getRemaining());
+	out.append(evtOut);
+	return out;
+}

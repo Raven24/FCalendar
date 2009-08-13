@@ -1,6 +1,8 @@
 #include <QHttp>
 #include <QTabWidget>
 
+#include "vcalparser.h"
+
 #ifndef CALENDAR_H
 #define CALENDAR_H
 
@@ -23,12 +25,15 @@ public:
 
 public slots:
 	void populateList();
+	void showEventInfo(int row, int col);
+	void showTodoInfo(int row, int col);
 
 private:
 	QTableWidget *m_events;
 	QTableWidget *m_todos;
 	QTabWidget *m_tabs;
 	QHttp m_http;
+	VCalParser *parser;
 };
 
 #endif // CALENDAR_H

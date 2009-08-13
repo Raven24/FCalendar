@@ -60,16 +60,25 @@ void VCalParser::getEvents()
 	TEvent event;
 
 	for (int i = 0; i < eventList.size(); i++) {
-
+		event.setUid(eventList.at(i)["UID"]);
 		event.setDescription(eventList.at(i)["DESCRIPTION"]);
 		event.setSummary(eventList.at(i)["SUMMARY"]);
+		event.setLocation(eventList.at(i)["LOCATION"]);
+		// start date
 		if (eventList.at(i)["DTSTART"].size() > 1) {
-			//qDebug() << " DATETIME: " << decodeDate(eventList.at(i)["DTSTART"]).toString("yyyy-MM-dd, hh:mm:ss");
 			event.setStart(decodeDate(eventList.at(i)["DTSTART"]));
 		} else if (eventList.at(i)["DTSTART;VALUE=DATE"].size() > 1) {
 			event.setStart(decodeDate(eventList.at(i)["DTSTART;VALUE=DATE"]));
 		}
-		event.setEnd();
+		// end date
+		if (eventList.at(i)["DTEND"].size() > 1) {
+			event.setEnd(decodeDate(eventList.at(i)["DTEND"]));
+		} else if (eventList.at(i)["DTEND;VALUE=DATE"].size() > 1) {
+			event.setEnd(decodeDate(eventList.at(i)["DTEND;VALUE=DATE"]));
+		}
+		event.setLastModified(decodeDate(eventList.at(i)["LAST-MODIFIED"]));
+		event.setClass(eventList.at(i)["CLASS"]);
+		event.setStatus(eventList.at(i)["STATUS"]);
 		// qDebug() << event.toString();
 
 		m_events.append(event);
@@ -83,9 +92,14 @@ void VCalParser::getTodos()
 	TTodo todo;
 
 	for (int i = 0; i < todoList.size(); i++) {
+		todo.setUid(todoList.at(i)["UID"]);
 		todo.setDescription(todoList.at(i)["DESCRIPTION"]);
 		todo.setSummary(todoList.at(i)["SUMMARY"]);
+		todo.setLocation(todoList.at(i)["LOCATION"]);
 		todo.setPercentComplete(todoList.at(i)["PERCENT-COMPLETE"].toInt());
+		todo.setLastModified(decodeDate(todoList.at(i)["LAST-MODIFIED"]));
+		todo.setClass(todoList.at(i)["CLASS"]);
+		todo.setStatus(todoList.at(i)["STATUS"]);
 
 		m_todos.append(todo);
 	}

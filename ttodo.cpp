@@ -1,6 +1,8 @@
 #include "ttodo.h"
 #include "task.h"
 
+#include <QString>
+
 TTodo::TTodo()
 {
 }
@@ -28,4 +30,13 @@ bool TTodo::isComplete()
 		return true;
 	}
 	return false;
+}
+
+QString TTodo::toString()
+{
+	QString out = Task::toString();
+	QString todoOut = QString("\n\tComplete: %1")
+			.arg(getPercentComplete());
+	out.append(todoOut);
+	return out;
 }
