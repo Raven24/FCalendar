@@ -47,7 +47,7 @@ Calendar::Calendar(QWidget *parent)
 	m_tabs->addTab(m_events, tr("Events"));
 	m_tabs->addTab(m_todos, tr("Todos"));
 
-	initNetwork();
+	//initNetwork();
 	getData();
 
 	setCentralWidget(m_tabs);
