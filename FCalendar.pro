@@ -1,6 +1,9 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-08-06T13:14:21
 # -------------------------------------------------
+
+include(qts60main.pri)
+
 TARGET = FCalendar
 TEMPLATE = app
 SOURCES += main.cpp \
