@@ -2,8 +2,6 @@
 # Project created by QtCreator 2009-08-06T13:14:21
 # -------------------------------------------------
 
-include(qts60main.pri)
-
 TARGET = FCalendar
 TEMPLATE = app
 SOURCES += main.cpp \
@@ -21,6 +19,7 @@ FORMS +=
 QT += network
 
 symbian {
+	include(qts60main.pri)
     HEADERS +=  sym_iap_util.h
     INCLUDEPATH += $$APP_LAYER_SYSTEMINCLUDE
     TARGET.CAPABILITY="NetworkServices"

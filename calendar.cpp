@@ -52,7 +52,9 @@ Calendar::Calendar(QWidget *parent)
 	m_tabs->addTab(m_events, tr("Events"));
 	m_tabs->addTab(m_todos, tr("Todos"));
 
-	//initNetwork();
+#ifndef Q_OS_SYMBIAN
+	initNetwork();
+#endif
 	getData();
 
 	setCentralWidget(m_tabs);
@@ -104,7 +106,17 @@ void Calendar::populateList(QNetworkReply *networkReply)
 void Calendar::getData()
 {
 	qDebug() << "fetching data...";
-	networkManager.get(QNetworkRequest(QString("http://florian:Apfelkuchen12@aristoteles.serveftp.org/calendar/icalclient.php")));
+	QUrl url;
+	url.setScheme("http");
+	url.setHost("aristoteles.serveftp.org");
+	url.setPath("/calendar/icalclient.php");
+	url.setUserName("florian");
+	url.setPassword("Apfelkuchen12");
+	url.setPort(80);
+	
+	qDebug() << url.toString();
+	
+	networkManager.get(QNetworkRequest(url));
 }
 
 void Calendar::initNetwork()
