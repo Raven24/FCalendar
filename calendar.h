@@ -33,6 +33,10 @@ private:
 	QTabWidget *m_tabs;
 	QNetworkAccessManager networkManager;
 	VCalParser *parser;
+	
+#ifdef Q_OS_SYMBIAN
+	bool bDefaultIapSet;
+#endif
 };
 
 #endif // CALENDAR_H

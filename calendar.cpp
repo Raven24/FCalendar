@@ -54,6 +54,11 @@ Calendar::Calendar(QWidget *parent)
 
 #ifndef Q_OS_SYMBIAN
 	initNetwork();
+#else
+	if(!bDefaultIapSet) {
+		qt_SetDefaultIap();
+		bDefaultIapSet = true;
+	}
 #endif
 	getData();
 
