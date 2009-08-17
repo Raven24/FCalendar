@@ -10,7 +10,6 @@
 
 
 class QTableWidget;
-class QHttp;
 class QNetworkReply;
 
 class Calendar : public QMainWindow

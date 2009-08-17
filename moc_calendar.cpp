@@ -1,13 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'calendar.h'
 **
-<<<<<<< .mine
-** Created: Thu Aug 13 23:37:38 2009
-**      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
-=======
-** Created: Fri Aug 14 12:52:21 2009
+** Created: Mon Aug 17 08:49:48 2009
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.2-tower)
->>>>>>> .r44
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -16,11 +11,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'calendar.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 61
-<<<<<<< .mine
-#error "This file was generated using the moc from 4.5.0. It"
-=======
 #error "This file was generated using the moc from 4.5.2-tower. It"
->>>>>>> .r44
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -38,15 +29,16 @@ static const uint qt_meta_data_Calendar[] = {
        0,    0, // constructors
 
  // slots: signature, parameters, type, tag, flags
-      10,    9,    9,    9, 0x0a,
-      33,   25,    9,    9, 0x0a,
-      56,   25,    9,    9, 0x0a,
+      23,   10,    9,    9, 0x0a,
+      60,   52,    9,    9, 0x0a,
+      83,   52,    9,    9, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_Calendar[] = {
-    "Calendar\0\0populateList()\0row,col\0"
+    "Calendar\0\0networkReply\0"
+    "populateList(QNetworkReply*)\0row,col\0"
     "showEventInfo(int,int)\0showTodoInfo(int,int)\0"
 };
 
@@ -75,7 +67,7 @@ int Calendar::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: populateList(); break;
+        case 0: populateList((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
         case 1: showEventInfo((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         case 2: showTodoInfo((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         default: ;

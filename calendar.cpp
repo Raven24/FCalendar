@@ -4,7 +4,7 @@
 #include "ttodo.h"
 #include "vcalparser.h"
 
-#include <QTNetwork>
+#include <QtNetwork>
 #include <QHeaderView>
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -105,7 +105,7 @@ void Calendar::getData()
 
 void Calendar::initNetwork()
 {
-	m_http.setProxy("proxy.bmlv.gv.at", 3128, "", "");
+	// m_http.setProxy("proxy.bmlv.gv.at", 3128, "", "");
 }
 
 void Calendar::showEventInfo(int row, int col)
