@@ -1,4 +1,5 @@
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QTabWidget>
 
 #include "vcalparser.h"
@@ -8,9 +9,7 @@
 
 #include <QtGui/QMainWindow>
 
-
 class QTableWidget;
-class QNetworkReply;
 
 class Calendar : public QMainWindow
 {
