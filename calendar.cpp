@@ -4,11 +4,11 @@
 #include "ttodo.h"
 #include "vcalparser.h"
 
+#include <QTNetwork>
 #include <QHeaderView>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QString>
-#include <QHttp>
 #include <QDebug>
 #include <QTabWidget>
 
@@ -21,6 +21,7 @@ Calendar::Calendar(QWidget *parent)
 	//connect signals
 	connect(m_events, SIGNAL(cellClicked(int,int)), this, SLOT(showEventInfo(int, int)));
 	connect(m_todos, SIGNAL(cellClicked(int,int)), this, SLOT(showTodoInfo(int, int)));
+	connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(populateList(QNetworkReply*)));
 
 	m_events->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_events->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -57,53 +58,49 @@ Calendar::~Calendar()
 {
 }
 
-void Calendar::populateList()
+void Calendar::populateList(QNetworkReply *networkReply)
 {
-	qDebug() << "received bytes: " << m_http.bytesAvailable();
+	if(!networkReply->error()) {
+		QString response(networkReply->readAll());
+		// qDebug() << response;
 
-	QString response(m_http.readAll());
+		parser = new VCalParser(response);
 
-	//qDebug() << response;
+		qDebug() << "populating list ...";
 
-	parser = new VCalParser(response);
+		for (int i = 0; i < parser->m_events.size(); i++) {
 
-	qDebug() << "populating list ...";
+			TEvent event = parser->m_events.at(i);
 
-	for (int i = 0; i < parser->m_events.size(); i++) {
+			QTableWidgetItem *item1 = new QTableWidgetItem(event.getDescription(), 0);
+			QTableWidgetItem *item2 = new QTableWidgetItem(event.getRemaining(), 0);
 
-		TEvent event = parser->m_events.at(i);
+			int row = m_events->rowCount();
+			m_events->insertRow(row);
 
-		QTableWidgetItem *item1 = new QTableWidgetItem(event.getDescription(), 0);
-		QTableWidgetItem *item2 = new QTableWidgetItem(event.getRemaining(), 0);
+			m_events->setItem(row, 0, item1);
+			m_events->setItem(row, 1, item2);
 
-		int row = m_events->rowCount();
-		m_events->insertRow(row);
+		}
 
-		m_events->setItem(row, 0, item1);
-		m_events->setItem(row, 1, item2);
+		for (int j = 0; j < parser->m_todos.size(); j++) {
+			TTodo todo =parser->m_todos.at(j);
 
-	}
+			QTableWidgetItem *item1 = new QTableWidgetItem(todo.getSummary(), 0);
+			int row = m_todos->rowCount();
+			m_todos->insertRow(row);
+			m_todos->setItem(row, 0, item1);
 
-	for (int j = 0; j < parser->m_todos.size(); j++) {
-		TTodo todo =parser->m_todos.at(j);
+		}
 
-		QTableWidgetItem *item1 = new QTableWidgetItem(todo.getSummary(), 0);
-		int row = m_todos->rowCount();
-		m_todos->insertRow(row);
-		m_todos->setItem(row, 0, item1);
-
+		networkReply->deleteLater();
 	}
 }
 
 void Calendar::getData()
 {
-	m_http.setHost("aristoteles.serveftp.org");
-	m_http.setUser("florian", "Apfelkuchen12");
-
 	qDebug() << "fetching data...";
-
-	m_http.get("/calendar/icalclient.php");
-	connect(&m_http, SIGNAL(done(bool)), this, SLOT(populateList()));
+	networkManager.get(QNetworkRequest(QString("http://florian:Apfelkuchen12@aristoteles.serveftp.org/calendar/icalclient.php")));
 }
 
 void Calendar::initNetwork()

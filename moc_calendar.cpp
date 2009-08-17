@@ -1,8 +1,13 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'calendar.h'
 **
+<<<<<<< .mine
+** Created: Thu Aug 13 23:37:38 2009
+**      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
+=======
 ** Created: Fri Aug 14 12:52:21 2009
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.2-tower)
+>>>>>>> .r44
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,7 +16,11 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'calendar.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 61
+<<<<<<< .mine
+#error "This file was generated using the moc from 4.5.0. It"
+=======
 #error "This file was generated using the moc from 4.5.2-tower. It"
+>>>>>>> .r44
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif

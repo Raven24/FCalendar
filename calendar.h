@@ -1,4 +1,4 @@
-#include <QHttp>
+#include <QNetworkAccessManager>
 #include <QTabWidget>
 
 #include "vcalparser.h"
@@ -11,6 +11,7 @@
 
 class QTableWidget;
 class QHttp;
+class QNetworkReply;
 
 class Calendar : public QMainWindow
 {
@@ -24,7 +25,7 @@ public:
 	void initNetwork();
 
 public slots:
-	void populateList();
+	void populateList(QNetworkReply *networkReply);
 	void showEventInfo(int row, int col);
 	void showTodoInfo(int row, int col);
 
@@ -32,7 +33,7 @@ private:
 	QTableWidget *m_events;
 	QTableWidget *m_todos;
 	QTabWidget *m_tabs;
-	QHttp m_http;
+	QNetworkAccessManager networkManager;
 	VCalParser *parser;
 };
 
