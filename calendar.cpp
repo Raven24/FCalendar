@@ -105,7 +105,11 @@ void Calendar::getData()
 
 void Calendar::initNetwork()
 {
-	// m_http.setProxy("proxy.bmlv.gv.at", 3128, "", "");
+  	QNetworkProxy proxy;
+	proxy.setHostName(QString("proxy.bmlv.gv.at"));
+	proxy.setPort(3128);
+	proxy.setType(QNetworkProxy::HttpProxy);
+	networkManager.setProxy(proxy);
 }
 
 void Calendar::showEventInfo(int row, int col)
