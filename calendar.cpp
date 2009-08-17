@@ -12,6 +12,10 @@
 #include <QDebug>
 #include <QTabWidget>
 
+#ifdef Q_OS_SYMBIAN
+#include "sym_iap_util.h"
+#endif
+
 Calendar::Calendar(QWidget *parent)
 	: QMainWindow(parent)
 {
