@@ -19,6 +19,9 @@
 Calendar::Calendar(QWidget *parent)
 	: QMainWindow(parent)
 {
+	settings = new QSettings("FCalendar", "FCalendar");
+	checkSettings();
+	
 	m_events = new QTableWidget(0, 2);
 	m_todos = new QTableWidget(0, 1);
 
@@ -53,6 +56,7 @@ Calendar::Calendar(QWidget *parent)
 	m_tabs->addTab(m_todos, tr("Todos"));
 
 #ifndef Q_OS_SYMBIAN
+	qDebug() << "setting proxy";
 	initNetwork();
 #else
 	if(!bDefaultIapSet) {
@@ -112,12 +116,12 @@ void Calendar::getData()
 {
 	qDebug() << "fetching data...";
 	QUrl url;
-	url.setScheme("http");
-	url.setHost("aristoteles.serveftp.org");
-	url.setPath("/calendar/icalclient.php");
-	url.setUserName("florian");
-	url.setPassword("Apfelkuchen12");
-	url.setPort(80);
+	url.setScheme(settings->value("calendar/urlscheme").toString());
+	url.setHost(settings->value("calendar/hostname").toString());
+	url.setPath(settings->value("calendar/path").toString());
+	url.setUserName(settings->value("calendar/username").toString());
+	url.setPassword(settings->value("calendar/password").toString());
+	url.setPort(settings->value("calendar/port").toInt());
 	
 	qDebug() << url.toString();
 	
@@ -127,9 +131,12 @@ void Calendar::getData()
 void Calendar::initNetwork()
 {
   	QNetworkProxy proxy;
-	proxy.setHostName(QString("proxy.bmlv.gv.at"));
-	proxy.setPort(3128);
+	proxy.setHostName(settings->value("network/proxyHost").toString());
+	proxy.setPort(settings->value("network/proxyPort").toInt());
 	proxy.setType(QNetworkProxy::HttpProxy);
+	
+	qDebug() << "Proxy: " << settings->value("network/proxyHost").toString() << ":" << settings->value("network/proxyPort").toInt();
+	
 	networkManager.setProxy(proxy);
 }
 
@@ -143,4 +150,32 @@ void Calendar::showTodoInfo(int row, int col)
 {
 	TTodo todo = parser->m_todos.value(row);
 	qDebug() << todo.toString();
+}
+
+void Calendar::checkSettings()
+{	
+	if (!settings->contains("calendar/hostname")) {
+		defineSettings("calendar");
+	} else if(!settings->contains("network/proxyHost")) {
+		defineSettings("network");
+	} 
+}
+
+void Calendar::defineSettings(const QString which) 
+{
+	qDebug() << "definition of " << which << " not implemented";
+		
+	settings->setValue("calendar/urlscheme", "http");
+	settings->setValue("calendar/hostname", "aristoteles.serveftp.org");
+	settings->setValue("calendar/port", 80);
+	settings->setValue("calendar/path", "/calendar/icalclient.php");
+	settings->setValue("calendar/username", "florian");
+	settings->setValue("calendar/password", "Apfelkuchen12");	
+	
+	settings->setValue("network/proxyHost", "proxy.bmlv.gv.at");
+#ifndef Q_OS_SYMBIAN
+	settings->setValue("network/proxyPort", 3128);
+#else
+	settings->setValue("network/defaultIAP", "");
+#endif
 }
