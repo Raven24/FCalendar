@@ -11,6 +11,7 @@
 #include <QString>
 #include <QDebug>
 #include <QTabWidget>
+#include <QLabel>
 
 #ifdef Q_OS_SYMBIAN
 #include "sym_iap_util.h"
@@ -56,8 +57,9 @@ Calendar::Calendar(QWidget *parent)
 	m_tabs->addTab(m_todos, tr("Todos"));
 
 #ifndef Q_OS_SYMBIAN
-	qDebug() << "setting proxy";
-	initNetwork();
+        // make a switch to use a proxy
+        //qDebug() << "setting proxy";
+        //initNetwork();
 #else
 	if(!bDefaultIapSet) {
 		qt_SetDefaultIap();
@@ -87,14 +89,23 @@ void Calendar::populateList(QNetworkReply *networkReply)
 
 			TEvent event = parser->m_events.at(i);
 
-			QTableWidgetItem *item1 = new QTableWidgetItem(event.getDescription(), 0);
-			QTableWidgetItem *item2 = new QTableWidgetItem(event.getRemaining(), 0);
+                        //QTableWidgetItem *item1 = new QTableWidgetItem(event.getDescription(), 0);
+                        QTableWidgetItem *item2 = new QTableWidgetItem(event.getRemaining(), 0);
+                        //item1->setTextAlignment(Qt::AlignLeft);
+                        item2->setTextAlignment(Qt::AlignRight);
+
+                        QLabel *eventDescr = new QLabel();
+                        QLabel *eventTime = new QLabel();
+
+                        eventDescr->setText(event.getDescription());
+                        eventTime->setText(event.getStart());
 
 			int row = m_events->rowCount();
 			m_events->insertRow(row);
 
 			m_events->setItem(row, 0, item1);
-			m_events->setItem(row, 1, item2);
+                        //m_events->setItem(row, 1, item2);
+                        m_events->setCellWidget(row, 1, testLabel);
 
 		}
 
