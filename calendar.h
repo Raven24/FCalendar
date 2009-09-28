@@ -28,6 +28,10 @@ public slots:
 	void populateList(QNetworkReply *networkReply);
 	void showEventInfo(int row, int col);
 	void showTodoInfo(int row, int col);
+	void scrollToNearestItem();
+
+signals:
+	void listPopulated();
 
 private:
 	void checkSettings();

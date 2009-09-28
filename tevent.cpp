@@ -36,6 +36,15 @@ QDateTime TEvent::getStart()
 	return m_start;
 }
 
+QString TEvent::getStartString()
+{
+    if(m_start.toString("h") == QString("0")) {
+        return QString(m_start.toString("ddd d.M.yy"));
+    } else {
+        return QString(m_start.toString("ddd d.M.yy h:mm"));
+    }
+}
+
 QDateTime TEvent::getEnd()
 {
 	return m_end;

@@ -31,6 +31,7 @@ Calendar::Calendar(QWidget *parent)
 	connect(m_events, SIGNAL(cellClicked(int,int)), this, SLOT(showEventInfo(int, int)));
 	connect(m_todos, SIGNAL(cellClicked(int,int)), this, SLOT(showTodoInfo(int, int)));
 	connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(populateList(QNetworkReply*)));
+	connect(this, SIGNAL(listPopulated()), this, SLOT(scrollToNearestItem()));
 
 	m_events->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_events->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -111,15 +112,15 @@ void Calendar::populateList(QNetworkReply *networkReply)
 			smallFont.setPointSize(7);
 
 			// color settings
-			QString css = QString("QLabel { color: #454545; }");
+            QString css = QString("QLabel { color: #454545; }");
 			
             eventDescr->setText(event.getDescription());
 			eventDescr->setFont(bigFont);
 
 			eventTime->setStyleSheet(css);
-			eventTime->setText(event.getStart().toString("ddd d.M.yy, h:mm "));
+            eventTime->setText(event.getStartString());
 			eventTime->setFont(smallFont);
-
+            eventTime->setAlignment(Qt::AlignRight | Qt::AlignTop);
 
 			QVBoxLayout *layout = new QVBoxLayout;
 			layout->addWidget(eventDescr);
@@ -148,6 +149,13 @@ void Calendar::populateList(QNetworkReply *networkReply)
 
 		networkReply->deleteLater();
 	}
+
+	emit listPopulated();
+}
+
+void Calendar::scrollToNearestItem()
+{
+
 }
 
 void Calendar::getData()
@@ -161,7 +169,7 @@ void Calendar::getData()
 	url.setPassword(settings->value("calendar/password").toString());
 	url.setPort(settings->value("calendar/port").toInt());
 	
-	qDebug() << url.toString();
+    //qDebug() << url.toString();
 	
 	networkManager.get(QNetworkRequest(url));
 }
