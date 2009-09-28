@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QTabWidget>
 #include <QLabel>
+#include <QVBoxLayout>
 
 #ifdef Q_OS_SYMBIAN
 #include "sym_iap_util.h"
@@ -57,9 +58,12 @@ Calendar::Calendar(QWidget *parent)
 	m_tabs->addTab(m_todos, tr("Todos"));
 
 #ifndef Q_OS_SYMBIAN
-        // make a switch to use a proxy
-        //qDebug() << "setting proxy";
-        //initNetwork();
+
+	if(settings->value("network/useProxy").toBool()) {
+		qDebug() << "setting proxy";
+		initNetwork();
+	}
+
 #else
 	if(!bDefaultIapSet) {
 		qt_SetDefaultIap();
@@ -89,23 +93,46 @@ void Calendar::populateList(QNetworkReply *networkReply)
 
 			TEvent event = parser->m_events.at(i);
 
-                        //QTableWidgetItem *item1 = new QTableWidgetItem(event.getDescription(), 0);
-                        QTableWidgetItem *item2 = new QTableWidgetItem(event.getRemaining(), 0);
-                        //item1->setTextAlignment(Qt::AlignLeft);
-                        item2->setTextAlignment(Qt::AlignRight);
+            //QTableWidgetItem *item1 = new QTableWidgetItem(event.getDescription(), 0);
+            QTableWidgetItem *item2 = new QTableWidgetItem(event.getRemaining(), 0);
+            //item1->setTextAlignment(Qt::AlignLeft);
+            item2->setTextAlignment(Qt::AlignRight);
 
-                        QLabel *eventDescr = new QLabel();
-                        QLabel *eventTime = new QLabel();
+			QWidget *leftColumn = new QWidget;
+            QLabel *eventDescr = new QLabel();
+            QLabel *eventTime = new QLabel();
 
-                        eventDescr->setText(event.getDescription());
-                        eventTime->setText(event.getStart());
+			// font settings
+			QFont bigFont;
+			bigFont.setPointSize(8);
+			bigFont.setBold(true);
+
+			QFont smallFont;
+			smallFont.setPointSize(7);
+
+			// color settings
+			QString css = QString("QLabel { color: #454545; }");
+			
+            eventDescr->setText(event.getDescription());
+			eventDescr->setFont(bigFont);
+
+			eventTime->setStyleSheet(css);
+			eventTime->setText(event.getStart().toString("ddd d.M.yy, h:mm "));
+			eventTime->setFont(smallFont);
+
+
+			QVBoxLayout *layout = new QVBoxLayout;
+			layout->addWidget(eventDescr);
+			layout->addWidget(eventTime);
+
+			leftColumn->setLayout(layout);
 
 			int row = m_events->rowCount();
 			m_events->insertRow(row);
 
-			m_events->setItem(row, 0, item1);
-                        //m_events->setItem(row, 1, item2);
-                        m_events->setCellWidget(row, 1, testLabel);
+			m_events->setCellWidget(row, 0, leftColumn);
+            //m_events->setItem(row, 1, item2);
+            m_events->setItem(row, 1, item2);
 
 		}
 
@@ -153,12 +180,14 @@ void Calendar::initNetwork()
 
 void Calendar::showEventInfo(int row, int col)
 {
+	qDebug() << "click at: " << row << ", " << col;
 	TEvent evt = parser->m_events.value(row);
 	qDebug() << evt.toString();
 }
 
 void Calendar::showTodoInfo(int row, int col)
 {
+	qDebug() << "click at: " << row << ", " << col;
 	TTodo todo = parser->m_todos.value(row);
 	qDebug() << todo.toString();
 }
@@ -174,7 +203,7 @@ void Calendar::checkSettings()
 
 void Calendar::defineSettings(const QString which) 
 {
-	qDebug() << "definition of " << which << " not implemented";
+	qDebug() << "definition of " << which << " not implemented, setting default values";
 		
 	settings->setValue("calendar/urlscheme", "http");
 	settings->setValue("calendar/hostname", "aristoteles.serveftp.org");
@@ -184,6 +213,7 @@ void Calendar::defineSettings(const QString which)
 	settings->setValue("calendar/password", "Apfelkuchen12");	
 	
 	settings->setValue("network/proxyHost", "proxy.bmlv.gv.at");
+	settings->setValue("network/useProxy", false);
 #ifndef Q_OS_SYMBIAN
 	settings->setValue("network/proxyPort", 3128);
 #else
