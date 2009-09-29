@@ -8,6 +8,7 @@
 
 TEvent::TEvent()
 {
+	m_nextItem = false;
 }
 
 void TEvent::setStart(const QDateTime start)
@@ -29,6 +30,11 @@ void TEvent::setStart()
 void TEvent::setEnd()
 {
 	setEnd(QDateTime::currentDateTime());
+}
+
+void TEvent::setNextItem(const bool isNext)
+{
+	m_nextItem = isNext;
 }
 
 QDateTime TEvent::getStart()
@@ -105,4 +111,9 @@ QString TEvent::toString()
 					 .arg(m_start.toString(), m_end.toString(), getRemaining());
 	out.append(evtOut);
 	return out;
+}
+
+bool TEvent::isNextItem()
+{
+	return m_nextItem;
 }

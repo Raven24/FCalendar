@@ -11,6 +11,7 @@
 #include <QtGui/QMainWindow>
 
 class QTableWidget;
+class QTableWidgetItem;
 
 class Calendar : public QMainWindow
 {
@@ -42,6 +43,7 @@ private:
 	QNetworkAccessManager networkManager;
 	VCalParser *parser;
 	QSettings *settings;
+	int m_nextItemRow;
 	
 #ifdef Q_OS_SYMBIAN
 	bool bDefaultIapSet;

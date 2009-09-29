@@ -15,6 +15,7 @@ VCalParser::VCalParser()
 
 VCalParser::VCalParser(QString &vcaldata)
 {
+	nextDefined = false;
 	m_rawData = new QString(vcaldata);
 	getEvents();
 	getTodos();
@@ -81,6 +82,12 @@ void VCalParser::getEvents()
 		event.setStatus(eventList.at(i)["STATUS"]);
 		// qDebug() << event.toString();
 
+		if ((event.getStart() > QDateTime(QDateTime::currentDateTime())) && !nextDefined) {
+			event.setNextItem(true);
+			nextDefined = true;
+		} else {
+			event.setNextItem(false);
+		}
 		m_events.append(event);
 	}
 }

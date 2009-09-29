@@ -116,11 +116,13 @@ void Calendar::populateList(QNetworkReply *networkReply)
 			
             eventDescr->setText(event.getDescription());
 			eventDescr->setFont(bigFont);
+			eventDescr->setMinimumHeight(12);
 
 			eventTime->setStyleSheet(css);
             eventTime->setText(event.getStartString());
 			eventTime->setFont(smallFont);
             eventTime->setAlignment(Qt::AlignRight | Qt::AlignTop);
+			eventTime->setMinimumHeight(27);
 
 			QVBoxLayout *layout = new QVBoxLayout;
 			layout->addWidget(eventDescr);
@@ -130,7 +132,9 @@ void Calendar::populateList(QNetworkReply *networkReply)
 
 			int row = m_events->rowCount();
 			m_events->insertRow(row);
-
+			if (event.isNextItem()) {
+				m_nextItemRow = row;
+			}
 			m_events->setCellWidget(row, 0, leftColumn);
             //m_events->setItem(row, 1, item2);
             m_events->setItem(row, 1, item2);
@@ -155,6 +159,8 @@ void Calendar::populateList(QNetworkReply *networkReply)
 
 void Calendar::scrollToNearestItem()
 {
+	//qDebug() << m_nextItemRow;
+	m_events->setCurrentCell(m_nextItemRow, 0);
 
 }
 
@@ -211,6 +217,7 @@ void Calendar::checkSettings()
 
 void Calendar::defineSettings(const QString which) 
 {
+	// TODO: config dialog via QStackedWidget and multiple widgets
 	qDebug() << "definition of " << which << " not implemented, setting default values";
 		
 	settings->setValue("calendar/urlscheme", "http");

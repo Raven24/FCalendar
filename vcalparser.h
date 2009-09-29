@@ -21,16 +21,17 @@ public:
 	void getEvents();
 	void getTodos();
 
-	QList<TEvent> m_events;
-	QList<TTodo> m_todos;
-	QDateTime decodeDate(QString date);
+	QList<TEvent>	m_events;
+	QList<TTodo>	m_todos;
+	QDateTime		decodeDate(QString date);
 
 private:
 	QList<QMap <QString, QString> > split();
 	QList<QMap <QString, QString> > split(QString type);
 
-	QString *m_rawData;
+	QString		*m_rawData;
 	QStringList *m_rawTasks;
+	bool		nextDefined;
 };
 
 #endif // VCALPARSER_H

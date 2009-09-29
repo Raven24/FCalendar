@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'calendar.h'
 **
-** Created: Fri Aug 21 12:53:22 2009
+** Created: Tue Sep 29 01:40:58 2009
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,23 +23,28 @@ static const uint qt_meta_data_Calendar[] = {
        2,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   12, // methods
+       5,   12, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
 
+ // signals: signature, parameters, type, tag, flags
+      10,    9,    9,    9, 0x05,
+
  // slots: signature, parameters, type, tag, flags
-      23,   10,    9,    9, 0x0a,
-      60,   52,    9,    9, 0x0a,
-      83,   52,    9,    9, 0x0a,
+      39,   26,    9,    9, 0x0a,
+      76,   68,    9,    9, 0x0a,
+      99,   68,    9,    9, 0x0a,
+     121,    9,    9,    9, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_Calendar[] = {
-    "Calendar\0\0networkReply\0"
+    "Calendar\0\0listPopulated()\0networkReply\0"
     "populateList(QNetworkReply*)\0row,col\0"
     "showEventInfo(int,int)\0showTodoInfo(int,int)\0"
+    "scrollToNearestItem()\0"
 };
 
 const QMetaObject Calendar::staticMetaObject = {
@@ -67,13 +72,21 @@ int Calendar::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: populateList((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
-        case 1: showEventInfo((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 2: showTodoInfo((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 0: listPopulated(); break;
+        case 1: populateList((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
+        case 2: showEventInfo((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 3: showTodoInfo((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 4: scrollToNearestItem(); break;
         default: ;
         }
-        _id -= 3;
+        _id -= 5;
     }
     return _id;
+}
+
+// SIGNAL 0
+void Calendar::listPopulated()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, 0);
 }
 QT_END_MOC_NAMESPACE
