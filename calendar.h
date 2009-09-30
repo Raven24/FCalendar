@@ -10,6 +10,8 @@
 
 #include <QtGui/QMainWindow>
 
+class QWidget;
+class QStackedWidget;
 class QTableWidget;
 class QTableWidgetItem;
 
@@ -30,9 +32,14 @@ public slots:
 	void showEventInfo(int row, int col);
 	void showTodoInfo(int row, int col);
 	void scrollToNearestItem();
+	void saveSettings();
+	void abortSaveSettings();
+	void configSettings();
+	void configNetwork();
 
 signals:
 	void listPopulated();
+	void settingsChanged(const QString which);
 
 private:
 	void checkSettings();
@@ -40,10 +47,16 @@ private:
 	QTableWidget *m_events;
 	QTableWidget *m_todos;
 	QTabWidget *m_tabs;
+	QStackedWidget *stackedWidget;
 	QNetworkAccessManager networkManager;
 	VCalParser *parser;
 	QSettings *settings;
 	int m_nextItemRow;
+	QWidget *m_configDialog;
+	QWidget *m_netDialog;
+	QLineEdit *urlscheme, *hostname, *port, *path, *username, *password, *proxyHost, *proxyPort;
+	QPushButton *save, *abort;
+	QCheckBox *useProxy;
 	
 #ifdef Q_OS_SYMBIAN
 	bool bDefaultIapSet;

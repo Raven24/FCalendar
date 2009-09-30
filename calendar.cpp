@@ -4,6 +4,8 @@
 #include "ttodo.h"
 #include "vcalparser.h"
 
+#include <QtCore>
+#include <QtGui>
 #include <QtNetwork>
 #include <QHeaderView>
 #include <QTableWidget>
@@ -13,6 +15,12 @@
 #include <QTabWidget>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QFormLayout>
+#include <QStackedWidget>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QPushButton>
 
 #ifdef Q_OS_SYMBIAN
 #include "sym_iap_util.h"
@@ -22,8 +30,32 @@ Calendar::Calendar(QWidget *parent)
 	: QMainWindow(parent)
 {
 	settings = new QSettings("FCalendar", "FCalendar");
+	m_configDialog = new QWidget();
+	m_netDialog = new QWidget();
+	m_tabs = new QTabWidget();
+
+	stackedWidget = new QStackedWidget();
+	stackedWidget->addWidget(m_configDialog);
+	stackedWidget->addWidget(m_netDialog);
+	stackedWidget->addWidget(m_tabs);
+
 	checkSettings();
-	
+
+	// context menu
+	QAction *configuration = new QAction("Configuration", this);
+	QAction *netSettings = new QAction("Net settings", this);
+	QAction *calendar = new QAction("Display Calendar", this);
+#if defined(Q_OS_SYMBIAN)
+	menuBar()->addAction(configuration);
+	menuBar()->addAction(netSettings);
+	menuBar()->addAction(calendar);
+#else
+	addAction(configuration);
+	addAction(netSettings);
+	addAction(calendar);
+	setContextMenuPolicy(Qt::ActionsContextMenu);
+#endif
+
 	m_events = new QTableWidget(0, 2);
 	m_todos = new QTableWidget(0, 1);
 
@@ -32,6 +64,9 @@ Calendar::Calendar(QWidget *parent)
 	connect(m_todos, SIGNAL(cellClicked(int,int)), this, SLOT(showTodoInfo(int, int)));
 	connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(populateList(QNetworkReply*)));
 	connect(this, SIGNAL(listPopulated()), this, SLOT(scrollToNearestItem()));
+	connect(configuration, SIGNAL(triggered()), this, SLOT(configSettings()));
+	connect(netSettings, SIGNAL(triggered()), this, SLOT(configNetwork()));
+	connect(calendar, SIGNAL(triggered()), this, SLOT(abortSaveSettings()));
 
 	m_events->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_events->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -54,7 +89,6 @@ Calendar::Calendar(QWidget *parent)
 	m_todos->verticalHeader()->hide();
 
 	// tab bar
-	m_tabs = new QTabWidget();
 	m_tabs->addTab(m_events, tr("Events"));
 	m_tabs->addTab(m_todos, tr("Todos"));
 
@@ -72,8 +106,7 @@ Calendar::Calendar(QWidget *parent)
 	}
 #endif
 	getData();
-
-	setCentralWidget(m_tabs);
+	setCentralWidget(stackedWidget);
 }
 
 Calendar::~Calendar()
@@ -212,26 +245,97 @@ void Calendar::checkSettings()
 		defineSettings("calendar");
 	} else if(!settings->contains("network/proxyHost")) {
 		defineSettings("network");
-	} 
+	}
+	//qDebug() << "checkSettings, currentIndex: " << stackedWidget->currentIndex();
+	abortSaveSettings();
 }
 
 void Calendar::defineSettings(const QString which) 
 {
-	// TODO: config dialog via QStackedWidget and multiple widgets
-	qDebug() << "definition of " << which << " not implemented, setting default values";
-		
-	settings->setValue("calendar/urlscheme", "http");
-	settings->setValue("calendar/hostname", "aristoteles.serveftp.org");
-	settings->setValue("calendar/port", 80);
-	settings->setValue("calendar/path", "/calendar/icalclient.php");
-	settings->setValue("calendar/username", "florian");
-	settings->setValue("calendar/password", "Apfelkuchen12");	
+
+
+	QFormLayout *settingsLayout = new QFormLayout();
+
+	if (which == QString("calendar")) {
+		stackedWidget->setCurrentIndex(0);
+		urlscheme = new QLineEdit(settings->value("calendar/urlscheme", "http").toString());
+		hostname = new QLineEdit(settings->value("calendar/hostname").toString());
+		port = new QLineEdit(settings->value("calendar/port", QString("80")).toString());
+		path = new QLineEdit(settings->value("calendar/path", "/calendar.ical").toString());
+		username = new QLineEdit(settings->value("calendar/username", "").toString());
+		password = new QLineEdit(settings->value("calendar/password", "").toString());
+
+		save =  new QPushButton(tr("Save"));
+		abort =  new QPushButton(tr("Abort"));
+		connect(save, SIGNAL(clicked()), this, SLOT(saveSettings()));
+		connect(abort, SIGNAL(clicked()), this, SLOT(abortSaveSettings()));
+
+		settingsLayout->addRow(tr("URL scheme"), urlscheme);
+		settingsLayout->addRow(tr("Hostname"), hostname);
+		settingsLayout->addRow(tr("Port"), port);
+		settingsLayout->addRow(tr("Path"), path);
+		settingsLayout->addRow(tr("Username"), username),
+		settingsLayout->addRow(tr("Password"), password);
+		settingsLayout->addRow(save);
+		settingsLayout->addRow(abort);
+
+		delete m_configDialog->layout();
+		m_configDialog->setLayout(settingsLayout);
+
+	} else if (which == QString("network")) {
+		stackedWidget->setCurrentIndex(1);
+		proxyHost = new QLineEdit(settings->value("network/proxyHost", "").toString());
+		proxyPort = new QLineEdit(settings->value("network/proxyPort", "").toString());
+		useProxy = new QCheckBox();
+		useProxy->setChecked(settings->value("network/useProxy", false).toBool());
+
+		save =  new QPushButton(tr("Save"));
+		abort =  new QPushButton(tr("Abort"));
+		connect(save, SIGNAL(clicked()), this, SLOT(saveSettings()));
+		connect(abort, SIGNAL(clicked()), this, SLOT(abortSaveSettings()));
+
+		settingsLayout->addRow(tr("Proxy Host"), proxyHost);
+		settingsLayout->addRow(tr("Proxy Port"), proxyPort);
+		settingsLayout->addRow(tr("Use Proxy"), useProxy);
+		settingsLayout->addRow(save);
+		settingsLayout->addRow(abort);
+
+		delete m_netDialog->layout();
+		m_netDialog->setLayout(settingsLayout);
+	}
+
+}
+
+void Calendar::saveSettings() {
+
+	settings->setValue("calendar/urlscheme", urlscheme->text());
+	settings->setValue("calendar/hostname", hostname->text());
+	settings->setValue("calendar/port", port->text().toInt());
+	settings->setValue("calendar/path", path->text());
+	settings->setValue("calendar/username", username->text());
+	settings->setValue("calendar/password", password->text());
 	
-	settings->setValue("network/proxyHost", "proxy.bmlv.gv.at");
-	settings->setValue("network/useProxy", false);
+	settings->setValue("network/proxyHost", proxyHost->text());
+	settings->setValue("network/useProxy", useProxy->isChecked());
 #ifndef Q_OS_SYMBIAN
-	settings->setValue("network/proxyPort", 3128);
+	settings->setValue("network/proxyPort", proxyPort->text().toInt());
 #else
 	settings->setValue("network/defaultIAP", "");
 #endif
+}
+
+void Calendar::abortSaveSettings()
+{
+	//qDebug() << stackedWidget->currentIndex();
+	stackedWidget->setCurrentIndex(2);
+}
+
+void Calendar::configSettings()
+{
+	defineSettings("calendar");
+}
+
+void Calendar::configNetwork()
+{
+	defineSettings("network");
 }
