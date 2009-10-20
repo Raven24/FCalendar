@@ -85,6 +85,7 @@ void VCalParser::getEvents()
 		if ((event.getStart() > QDateTime(QDateTime::currentDateTime())) && !nextDefined) {
 			event.setNextItem(true);
 			nextDefined = true;
+			nextEvent = i;
 		} else {
 			event.setNextItem(false);
 		}

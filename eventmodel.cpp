@@ -9,24 +9,24 @@ const int EventModel::RoleDate		= 2;
 const int EventModel::RoleRemaining	= 3;
 
 EventModel::EventModel(QObject *parent)
-		: QAbstractItemModel(parent)
+		: QAbstractTableModel(parent)
 {
 }
 
-void EventModel::fetchData(VCalParser parser)
+void EventModel::fetchData(VCalParser *parser)
 {
-	modelData = parser.m_events;
-//	emit dataChanged();
+	modelData = parser->m_events;
+	reset();
 }
 
 int EventModel::rowCount(const QModelIndex & /* parent */) const
 {
-	return 2;
+	return modelData.count();
 }
 
 int EventModel::columnCount(const QModelIndex & /* parent */) const
 {
-	return modelData.count();
+	return 2;
 }
 
 QVariant EventModel::data(const QModelIndex &index, int role) const
@@ -47,14 +47,20 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
 	}
 }
 
-QVariant EventModel::headerData(int section, Qt::Orientation /* orientation */, int /* role */) const
+QVariant EventModel::headerData(int section, Qt::Orientation /* orientation */, int role) const
 {
+	if (role == Qt::SizeHintRole) {
+		//qDebug() << "header data - size hint ";
+		switch(section) {
+			case 0: return QSize(100, 18);
+			case 1: return QSize(60, 18);
+		}
+	 }
+	//qDebug() << "header data requested: \n\tsection: " << section << "\n\trole: " << role;
 	switch(section) {
-		case 0:
-			return QString("Name");
-		case 1:
-			return QString("Time");
-		default:
-			return QVariant();
+		case 0: return QString("Name");
+		case 1: return QString("Time");
+		default: return QVariant();
+
 	}
 }

@@ -7,7 +7,7 @@
 class TEvent;
 class VCalParser;
 
-class EventModel : public QAbstractItemModel
+class EventModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
@@ -17,7 +17,7 @@ public:
 	static const int RoleRemaining;
 
 	EventModel(QObject *parent = 0);
-	void fetchData(VCalParser parser);
+	void fetchData(VCalParser *parser);
 
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;

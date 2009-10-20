@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'calendar.h'
 **
-** Created: Fri Oct 2 16:45:13 2009
-**      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
+** Created: Tue Oct 20 19:21:02 2009
+**      by: The Qt Meta Object Compiler version 61 (Qt 4.5.2-tower)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -11,7 +11,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'calendar.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 61
-#error "This file was generated using the moc from 4.5.0. It"
+#error "This file was generated using the moc from 4.5.2-tower. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -31,29 +31,29 @@ static const uint qt_meta_data_Calendar[] = {
  // signals: signature, parameters, type, tag, flags
       10,    9,    9,    9, 0x05,
       26,    9,    9,    9, 0x05,
+      46,   42,    9,    9, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      55,   42,    9,    9, 0x0a,
-      92,   84,    9,    9, 0x0a,
-     115,   84,    9,    9, 0x0a,
-     137,    9,    9,    9, 0x0a,
-     159,    9,    9,    9, 0x0a,
-     174,    9,    9,    9, 0x0a,
-     196,    9,    9,    9, 0x0a,
-     213,    9,    9,    9, 0x0a,
-     229,    9,    9,    9, 0x0a,
+      75,   62,    9,    9, 0x0a,
+     110,  104,    9,    9, 0x0a,
+     145,  137,    9,    9, 0x0a,
+     167,    9,    9,    9, 0x0a,
+     182,    9,    9,    9, 0x0a,
+     204,    9,    9,    9, 0x0a,
+     221,    9,    9,    9, 0x0a,
+     237,    9,    9,    9, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_Calendar[] = {
     "Calendar\0\0listPopulated()\0configChanged()\0"
-    "networkReply\0populateList(QNetworkReply*)\0"
-    "row,col\0showEventInfo(int,int)\0"
-    "showTodoInfo(int,int)\0scrollToNearestItem()\0"
-    "saveSettings()\0viewUpdatedCalendar()\0"
-    "configSettings()\0configNetwork()\0"
-    "getData()\0"
+    "row\0visibleRow(int)\0networkReply\0"
+    "populateList(QNetworkReply*)\0index\0"
+    "showEventInfo(QModelIndex)\0row,col\0"
+    "showTodoInfo(int,int)\0saveSettings()\0"
+    "viewUpdatedCalendar()\0configSettings()\0"
+    "configNetwork()\0getData()\0"
 };
 
 const QMetaObject Calendar::staticMetaObject = {
@@ -83,10 +83,10 @@ int Calendar::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id) {
         case 0: listPopulated(); break;
         case 1: configChanged(); break;
-        case 2: populateList((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
-        case 3: showEventInfo((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 4: showTodoInfo((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 5: scrollToNearestItem(); break;
+        case 2: visibleRow((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 3: populateList((*reinterpret_cast< QNetworkReply*(*)>(_a[1]))); break;
+        case 4: showEventInfo((*reinterpret_cast< const QModelIndex(*)>(_a[1]))); break;
+        case 5: showTodoInfo((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         case 6: saveSettings(); break;
         case 7: viewUpdatedCalendar(); break;
         case 8: configSettings(); break;
@@ -109,5 +109,12 @@ void Calendar::listPopulated()
 void Calendar::configChanged()
 {
     QMetaObject::activate(this, &staticMetaObject, 1, 0);
+}
+
+// SIGNAL 2
+void Calendar::visibleRow(int _t1)
+{
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 QT_END_MOC_NAMESPACE

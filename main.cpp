@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Calendar w;
 #ifdef Q_OS_SYMBIAN
-	w.showFullScreen();
+	w.showMaximized();
 #else
 	w.show();
 #endif

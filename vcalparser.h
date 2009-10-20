@@ -24,6 +24,7 @@ public:
 	QList<TEvent>	m_events;
 	QList<TTodo>	m_todos;
 	QDateTime		decodeDate(QString date);
+	int			nextEvent;
 
 private:
 	QList<QMap <QString, QString> > split();

@@ -3,6 +3,8 @@
 #include "tevent.h"
 #include "ttodo.h"
 #include "vcalparser.h"
+#include "eventdelegate.h"
+#include "eventmodel.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -62,7 +64,7 @@ Calendar::Calendar(QWidget *parent)
 	QAction *calendar = new QAction("Display Calendar", this);
 	QAction *updateCal = new QAction("Update Calendar", this);
 
-#if defined(Q_OS_SYMBIAN)
+#ifdef Q_OS_SYMBIAN
 	menuBar()->addAction(configuration);
 	menuBar()->addAction(netSettings);
 	menuBar()->addAction(calendar);
@@ -75,19 +77,29 @@ Calendar::Calendar(QWidget *parent)
 	setContextMenuPolicy(Qt::ActionsContextMenu);
 #endif
 
-	m_events = new QTableWidget(0, 2);
+	eventModel = new EventModel(this);
+	EventDelegate *eventDelegate = new EventDelegate(this);
+
+	m_events = new QTableView;
+	m_events->setModel(eventModel);
+	m_events->setItemDelegate(eventDelegate);
+
 	m_todos = new QTableWidget(0, 1);
 
 	//connect signals
-	connect(m_events, SIGNAL(cellClicked(int,int)), this, SLOT(showEventInfo(int, int)));
+	//connect(m_events, SIGNAL(cellClicked(int,int)), this, SLOT(showEventInfo(int, int)));
+	connect(m_events, SIGNAL(clicked(QModelIndex)), this, SLOT(showEventInfo(QModelIndex)));
 	connect(m_todos, SIGNAL(cellClicked(int,int)), this, SLOT(showTodoInfo(int, int)));
 	connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(populateList(QNetworkReply*)));
-	connect(this, SIGNAL(listPopulated()), this, SLOT(scrollToNearestItem()));
+
+	connect(this, SIGNAL(visibleRow(int)), m_events, SLOT(selectRow(int)));
+
 	connect(configuration, SIGNAL(triggered()), this, SLOT(configSettings()));
 	connect(netSettings, SIGNAL(triggered()), this, SLOT(configNetwork()));
 	connect(calendar, SIGNAL(triggered()), this, SLOT(viewUpdatedCalendar()));
 	connect(updateCal, SIGNAL(triggered()), this, SLOT(viewUpdatedCalendar()));
 	connect(this, SIGNAL(configChanged()), this, SLOT(getData()));
+
 	connect(saveSettingsBtn, SIGNAL(clicked()), this, SLOT(saveSettings()));
 	connect(abortSettingsBtn, SIGNAL(clicked()), this, SLOT(viewUpdatedCalendar()));
 	connect(saveNetworkBtn, SIGNAL(clicked()), this, SLOT(saveSettings()));
@@ -111,6 +123,7 @@ Calendar::Calendar(QWidget *parent)
 	}
 
 #else
+	bDefaultIapSet = false;
 	if(!bDefaultIapSet) {
 		qt_SetDefaultIap();
 		bDefaultIapSet = true;
@@ -136,56 +149,9 @@ void Calendar::populateList(QNetworkReply *networkReply)
 
 		qDebug() << "populating list ...";
 
-		for (int i = 0; i < parser->m_events.size(); i++) {
-
-			TEvent event = parser->m_events.at(i);
-
-            //QTableWidgetItem *item1 = new QTableWidgetItem(event.getDescription(), 0);
-            QTableWidgetItem *item2 = new QTableWidgetItem(event.getRemaining(), 0);
-            //item1->setTextAlignment(Qt::AlignLeft);
-            item2->setTextAlignment(Qt::AlignRight);
-
-			QWidget *leftColumn = new QWidget;
-            QLabel *eventDescr = new QLabel();
-            QLabel *eventTime = new QLabel();
-
-			// font settings
-			QFont bigFont;
-			bigFont.setPointSize(8);
-			bigFont.setBold(true);
-
-			QFont smallFont;
-			smallFont.setPointSize(7);
-
-			// color settings
-            QString css = QString("QLabel { color: #454545; }");
-			
-            eventDescr->setText(event.getDescription());
-			eventDescr->setFont(bigFont);
-			eventDescr->setMinimumHeight(12);
-
-			eventTime->setStyleSheet(css);
-            eventTime->setText(event.getStartString());
-			eventTime->setFont(smallFont);
-            eventTime->setAlignment(Qt::AlignRight | Qt::AlignTop);
-			eventTime->setMinimumHeight(27);
-
-			QVBoxLayout *layout = new QVBoxLayout;
-			layout->addWidget(eventDescr);
-			layout->addWidget(eventTime);
-
-			leftColumn->setLayout(layout);
-
-			int row = m_events->rowCount();
-			m_events->insertRow(row);
-			if (event.isNextItem()) {
-				m_nextItemRow = row;
-			}
-			m_events->setCellWidget(row, 0, leftColumn);
-            //m_events->setItem(row, 1, item2);
-            m_events->setItem(row, 1, item2);
-
-		}
+		eventModel->fetchData(parser);
+		emit visibleRow(parser->nextEvent);
+		m_events->resizeRowsToContents();
 
 		for (int j = 0; j < parser->m_todos.size(); j++) {
 			TTodo todo =parser->m_todos.at(j);
@@ -201,13 +167,6 @@ void Calendar::populateList(QNetworkReply *networkReply)
 	}
 
 	emit listPopulated();
-}
-
-void Calendar::scrollToNearestItem()
-{
-	//qDebug() << m_nextItemRow;
-	m_events->setCurrentCell(m_nextItemRow, 0);
-
 }
 
 void Calendar::getData()
@@ -238,11 +197,12 @@ void Calendar::initNetwork()
 	networkManager.setProxy(proxy);
 }
 
-void Calendar::showEventInfo(int row, int col)
+void Calendar::showEventInfo(const QModelIndex & index)
 {
-	qDebug() << "click at: " << row << ", " << col;
-	TEvent evt = parser->m_events.value(row);
-	qDebug() << evt.toString();
+	qDebug() << "click at: " << index.row();
+	m_events->resizeRowToContents(index.row());
+	//TEvent evt = parser->m_events.value(row);
+	//qDebug() << evt.toString();
 }
 
 void Calendar::showTodoInfo(int row, int col)
@@ -294,16 +254,16 @@ void Calendar::prepareTable()
 {
 	for (int i = m_todos->rowCount()-1; i >= 0; --i)
 		m_todos->removeRow(i);
-	for (int i = m_events->rowCount()-1; i >= 0; --i)
-		m_events->removeRow(i);
+//	for (int i = m_events->rowCount()-1; i >= 0; --i)
+//		m_events->removeRow(i);
 
 	// headers
-	QStringList eventLabels;
+	//QStringList eventLabels;
 	QStringList todoLabels;
 
-	eventLabels << tr("Name") << tr("Time");
+	//eventLabels << tr("Name") << tr("Time");
 	todoLabels << tr("Todo");
-	m_events->setHorizontalHeaderLabels(eventLabels);
+//	m_events->setHorizontalHeaderLabels(eventLabels);
 	m_events->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
 	m_events->verticalHeader()->hide();
 

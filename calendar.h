@@ -1,9 +1,9 @@
-#include <QNetworkAccessManager>
+#include <QtGui>
 #include <QNetworkReply>
-#include <QTabWidget>
-#include <QSettings>
+#include <QNetworkAccessManager>
 
 #include "vcalparser.h"
+#include "eventmodel.h"
 
 #ifndef CALENDAR_H
 #define CALENDAR_H
@@ -32,9 +32,8 @@ public:
 
 public slots:
 	void populateList(QNetworkReply *networkReply);
-	void showEventInfo(int row, int col);
+	void showEventInfo(const QModelIndex & index);
 	void showTodoInfo(int row, int col);
-	void scrollToNearestItem();
 	void saveSettings();
 	void viewUpdatedCalendar();
 	void configSettings();
@@ -44,17 +43,19 @@ public slots:
 signals:
 	void listPopulated();
 	void configChanged();
+	void visibleRow(int row);
 
 private:
 	void checkSettings();
 	void prepareTable();
   
-	QTableWidget *m_events;
+	QTableView *m_events;
 	QTableWidget *m_todos;
 	QTabWidget *m_tabs;
 	QStackedWidget *stackedWidget;
 	QNetworkAccessManager networkManager;
 	VCalParser *parser;
+	EventModel *eventModel;
 	QSettings *settings;
 	int m_nextItemRow;
 	QWidget *m_configDialog;
