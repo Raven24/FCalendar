@@ -88,7 +88,7 @@ Calendar::Calendar(QWidget *parent)
 
 	//connect signals
 	//connect(m_events, SIGNAL(cellClicked(int,int)), this, SLOT(showEventInfo(int, int)));
-	connect(m_events, SIGNAL(clicked(QModelIndex)), this, SLOT(showEventInfo(QModelIndex)));
+	connect(m_events, SIGNAL(activated(QModelIndex)), this, SLOT(showEventInfo(QModelIndex)));
 	connect(m_todos, SIGNAL(cellClicked(int,int)), this, SLOT(showTodoInfo(int, int)));
 	connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(populateList(QNetworkReply*)));
 
@@ -150,8 +150,11 @@ void Calendar::populateList(QNetworkReply *networkReply)
 		qDebug() << "populating list ...";
 
 		eventModel->fetchData(parser);
-		emit visibleRow(parser->nextEvent);
 		m_events->resizeRowsToContents();
+		emit visibleRow(parser->nextEvent);
+		showEventInfo(m_events->currentIndex());
+		m_currentEventRow = parser->nextEvent;
+		//showEventInfo(m_events->model()->index(parser->nextEvent, 0));
 
 		for (int j = 0; j < parser->m_todos.size(); j++) {
 			TTodo todo =parser->m_todos.at(j);
@@ -199,10 +202,14 @@ void Calendar::initNetwork()
 
 void Calendar::showEventInfo(const QModelIndex & index)
 {
-	qDebug() << "click at: " << index.row();
-	m_events->resizeRowToContents(index.row());
-	//TEvent evt = parser->m_events.value(row);
-	//qDebug() << evt.toString();
+	// reset the height of the previously selected item
+	m_events->setRowHeight(m_currentEventRow, m_events->itemDelegate(index)->sizeHint(QStyleOptionViewItem(), index).height());
+
+	// set the height of the current row to what is specified in the sizeHint
+	QStyleOptionViewItem option = QStyleOptionViewItem();
+	option.state = QStyle::State_Selected;
+	m_events->setRowHeight(index.row(), m_events->itemDelegate(index)->sizeHint(option, index).height());
+	m_currentEventRow = index.row();
 }
 
 void Calendar::showTodoInfo(int row, int col)

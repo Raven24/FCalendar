@@ -4,10 +4,6 @@
 #include "vcalparser.h"
 #include "tevent.h"
 
-const int EventModel::RoleSummary	= 1;
-const int EventModel::RoleDate		= 2;
-const int EventModel::RoleRemaining	= 3;
-
 EventModel::EventModel(QObject *parent)
 		: QAbstractTableModel(parent)
 {
@@ -42,6 +38,8 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
 			return event.getStartString();
 		case RoleRemaining:
 			return event.getRemaining();
+		case RoleLocation:
+			return event.getLocation();
 		default:
 			return QVariant();
 	}

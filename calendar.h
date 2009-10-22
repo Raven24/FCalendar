@@ -58,6 +58,7 @@ private:
 	EventModel *eventModel;
 	QSettings *settings;
 	int m_nextItemRow;
+	int m_currentEventRow;
 	QWidget *m_configDialog;
 	QWidget *m_netDialog;
 	QLineEdit *urlscheme, *hostname, *port, *path, *username, *password, *proxyHost, *proxyPort;
