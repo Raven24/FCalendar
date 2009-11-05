@@ -4,6 +4,7 @@
 
 #include "vcalparser.h"
 #include "eventmodel.h"
+#include "eventtableview.h"
 
 #ifndef CALENDAR_H
 #define CALENDAR_H
@@ -49,7 +50,8 @@ private:
 	void checkSettings();
 	void prepareTable();
   
-	QTableView *m_events;
+	EventTableView *m_events;
+//	QTableView *m_events;
 	QTableWidget *m_todos;
 	QTabWidget *m_tabs;
 	QStackedWidget *stackedWidget;

@@ -5,24 +5,11 @@
 #include "vcalparser.h"
 #include "eventdelegate.h"
 #include "eventmodel.h"
+#include "eventtableview.h"
 
 #include <QtCore>
 #include <QtGui>
 #include <QtNetwork>
-#include <QHeaderView>
-#include <QTableWidget>
-#include <QTableWidgetItem>
-#include <QString>
-#include <QDebug>
-#include <QTabWidget>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QFormLayout>
-#include <QStackedWidget>
-#include <QLineEdit>
-#include <QCheckBox>
-#include <QPushButton>
 
 #ifdef Q_OS_SYMBIAN
 #include "sym_iap_util.h"
@@ -80,7 +67,8 @@ Calendar::Calendar(QWidget *parent)
 	eventModel = new EventModel(this);
 	EventDelegate *eventDelegate = new EventDelegate(this);
 
-	m_events = new QTableView;
+	m_events = new EventTableView();
+	//m_events = new QTableView();
 	m_events->setModel(eventModel);
 	m_events->setItemDelegate(eventDelegate);
 
@@ -89,6 +77,8 @@ Calendar::Calendar(QWidget *parent)
 	//connect signals
 	//connect(m_events, SIGNAL(cellClicked(int,int)), this, SLOT(showEventInfo(int, int)));
 	connect(m_events, SIGNAL(activated(QModelIndex)), this, SLOT(showEventInfo(QModelIndex)));
+	connect(m_events, SIGNAL(cursorChanged(QModelIndex)),
+			this, SLOT(showEventInfo(QModelIndex)));
 	connect(m_todos, SIGNAL(cellClicked(int,int)), this, SLOT(showTodoInfo(int, int)));
 	connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(populateList(QNetworkReply*)));
 
@@ -204,7 +194,7 @@ void Calendar::showEventInfo(const QModelIndex & index)
 {
 	// reset the height of the previously selected item
 	m_events->setRowHeight(m_currentEventRow, m_events->itemDelegate(index)->sizeHint(QStyleOptionViewItem(), index).height());
-
+	
 	// set the height of the current row to what is specified in the sizeHint
 	QStyleOptionViewItem option = QStyleOptionViewItem();
 	option.state = QStyle::State_Selected;
