@@ -23,6 +23,8 @@ public:
 	QString		getRemaining();
 	QString		toString();
 	bool		isNextItem();
+	bool		operator<(const TEvent &other) const;
+	bool		operator==(const TEvent &other) const;
 
 private:
 	QDateTime	m_start;

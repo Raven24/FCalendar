@@ -117,3 +117,21 @@ bool TEvent::isNextItem()
 {
 	return m_nextItem;
 }
+
+bool TEvent::operator<(const TEvent &other) const
+{
+	TEvent tmp = other;
+	if(m_start < tmp.getStart()) {
+		return true;
+	}
+	return false;
+}
+
+bool TEvent::operator==(const TEvent &other) const
+{
+	TEvent tmp = other;
+	if(m_start == tmp.getStart()) {
+		return true;
+	}
+	return false;
+}

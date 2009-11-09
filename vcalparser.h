@@ -3,13 +3,14 @@
 #include <QDateTime>
 #include <QString>
 
+#include "tevent.h"
+
 #ifndef VCALPARSER_H
 #define VCALPARSER_H
 
 class QString;
 class QStringList;
 class Task;
-class TEvent;
 class TTodo;
 
 class VCalParser
@@ -24,7 +25,8 @@ public:
 	QList<TEvent>	m_events;
 	QList<TTodo>	m_todos;
 	QDateTime		decodeDate(QString date);
-	int			nextEvent;
+	int				nextEventIndex;
+	TEvent			nextEvent;
 
 private:
 	QList<QMap <QString, QString> > split();

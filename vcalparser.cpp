@@ -1,12 +1,12 @@
+#include <QtGui>
+#include <QStringList>
+#include <QList>
+#include <QMap>
+
 #include "vcalparser.h"
 #include "task.h"
 #include "tevent.h"
 #include "ttodo.h"
-
-#include <QDebug>
-#include <QStringList>
-#include <QList>
-#include <QMap>
 
 VCalParser::VCalParser()
 {
@@ -85,12 +85,15 @@ void VCalParser::getEvents()
 		if ((event.getStart() > QDateTime(QDateTime::currentDateTime())) && !nextDefined) {
 			event.setNextItem(true);
 			nextDefined = true;
-			nextEvent = i;
+			nextEvent = event;
 		} else {
 			event.setNextItem(false);
 		}
 		m_events.append(event);
 	}
+
+	qSort(m_events);
+	nextEventIndex = (m_events.indexOf(nextEvent) - 1);
 }
 
 void VCalParser::getTodos()

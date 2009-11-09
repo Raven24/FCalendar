@@ -155,9 +155,9 @@ void Calendar::populateList(QNetworkReply *reply)
 
     eventModel->fetchData(parser);
     m_events->resizeRowsToContents();
-    emit visibleRow(parser->nextEvent);
+	emit visibleRow(parser->nextEventIndex);
     showEventInfo(m_events->currentIndex());
-    m_currentEventRow = parser->nextEvent;
+	m_currentEventRow = parser->nextEventIndex;
 
     for (int j = 0; j < parser->m_todos.size(); j++) {
         TTodo todo =parser->m_todos.at(j);
