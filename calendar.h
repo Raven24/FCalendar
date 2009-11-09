@@ -18,6 +18,7 @@ class QTableWidgetItem;
 class QLineEdit;
 class QPushButton;
 class QCheckBox;
+class QNetworkReply;
 
 class Calendar : public QMainWindow
 {
@@ -32,7 +33,8 @@ public:
 	void setupConfigLayouts();
 
 public slots:
-	void populateList(QNetworkReply *networkReply);
+        void authenticate(QNetworkReply* reply, QAuthenticator* auth);
+        void populateList(QNetworkReply *reply);
 	void showEventInfo(const QModelIndex & index);
 	void showTodoInfo(int row, int col);
 	void saveSettings();
@@ -40,27 +42,32 @@ public slots:
 	void configSettings();
 	void configNetwork();
 	void getData();
+        void outputError(QNetworkReply::NetworkError error);
+        void transmissionStats(const qint64 done, const qint64 total);
+        void outputError(QString message);
 
 signals:
 	void listPopulated();
 	void configChanged();
 	void visibleRow(int row);
+        void authLoop();
 
 private:
 	void checkSettings();
 	void prepareTable();
   
 	EventTableView *m_events;
-//	QTableView *m_events;
 	QTableWidget *m_todos;
 	QTabWidget *m_tabs;
 	QStackedWidget *stackedWidget;
-	QNetworkAccessManager networkManager;
+        QNetworkAccessManager *networkManager;
+        QNetworkReply *networkReply;
 	VCalParser *parser;
 	EventModel *eventModel;
 	QSettings *settings;
 	int m_nextItemRow;
 	int m_currentEventRow;
+        int authRetries;
 	QWidget *m_configDialog;
 	QWidget *m_netDialog;
 	QLineEdit *urlscheme, *hostname, *port, *path, *username, *password, *proxyHost, *proxyPort;

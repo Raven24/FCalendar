@@ -15,6 +15,10 @@
 #include "sym_iap_util.h"
 #endif
 
+/**
+ * constructor
+ * set up all the members
+ */
 Calendar::Calendar(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -75,20 +79,22 @@ Calendar::Calendar(QWidget *parent)
 	m_todos = new QTableWidget(0, 1);
 
 	//connect signals
-	//connect(m_events, SIGNAL(cellClicked(int,int)), this, SLOT(showEventInfo(int, int)));
 	connect(m_events, SIGNAL(activated(QModelIndex)), this, SLOT(showEventInfo(QModelIndex)));
 	connect(m_events, SIGNAL(cursorChanged(QModelIndex)),
 			this, SLOT(showEventInfo(QModelIndex)));
 	connect(m_todos, SIGNAL(cellClicked(int,int)), this, SLOT(showTodoInfo(int, int)));
-	connect(&networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(populateList(QNetworkReply*)));
 
-	connect(this, SIGNAL(visibleRow(int)), m_events, SLOT(selectRow(int)));
+        connect(this, SIGNAL(authLoop()),
+                this, SLOT(configSettings()));
+        connect(this, SIGNAL(visibleRow(int)),
+                m_events, SLOT(selectRow(int)));
 
 	connect(configuration, SIGNAL(triggered()), this, SLOT(configSettings()));
 	connect(netSettings, SIGNAL(triggered()), this, SLOT(configNetwork()));
 	connect(calendar, SIGNAL(triggered()), this, SLOT(viewUpdatedCalendar()));
 	connect(updateCal, SIGNAL(triggered()), this, SLOT(viewUpdatedCalendar()));
-	connect(this, SIGNAL(configChanged()), this, SLOT(getData()));
+        connect(this, SIGNAL(configChanged()),
+                this, SLOT(getData()));
 
 	connect(saveSettingsBtn, SIGNAL(clicked()), this, SLOT(saveSettings()));
 	connect(abortSettingsBtn, SIGNAL(clicked()), this, SLOT(viewUpdatedCalendar()));
@@ -105,63 +111,71 @@ Calendar::Calendar(QWidget *parent)
 	m_tabs->addTab(m_events, tr("Events"));
 	m_tabs->addTab(m_todos, tr("Todos"));
 
-#ifndef Q_OS_SYMBIAN
-
-	if(settings->value("network/useProxy").toBool()) {
-		qDebug() << "setting proxy";
-		initNetwork();
-	}
-
-#else
-	bDefaultIapSet = false;
-	if(!bDefaultIapSet) {
-		qt_SetDefaultIap();
-		bDefaultIapSet = true;
-	}
-#endif
+        initNetwork();
 	getData();
 	setCentralWidget(stackedWidget);
 }
 
+/**
+ * destructor
+ */
 Calendar::~Calendar()
 {
 }
 
-void Calendar::populateList(QNetworkReply *networkReply)
+/**
+ * test the network reply for errors
+ * if everything went fine, hand the data over to the parser and
+ * fill the table with data
+ */
+void Calendar::populateList(QNetworkReply *reply)
 {
-	if(!networkReply->error()) {
-		prepareTable();
+    networkReply = reply;
+    connect(networkReply, SIGNAL(error(QNetworkReply::NetworkError)),
+                this, SLOT(outputError(QNetworkReply::NetworkError)));
 
-		QString response(networkReply->readAll());
-		// qDebug() << response;
+    if(networkReply->error()) {
+        qDebug() << "Calendar::populateList() \n\tnetwork error";
+        int code = networkReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        if(code == 404) {
+            emit outputError(QString("404 - not found"));
+        } else {
+            qDebug() << "\t" << networkReply->errorString();
+        }
+        return;
+    }
 
-		parser = new VCalParser(response);
+    prepareTable();
 
-		qDebug() << "populating list ...";
+    QString response(networkReply->readAll());
+    //qDebug() << response;
 
-		eventModel->fetchData(parser);
-		m_events->resizeRowsToContents();
-		emit visibleRow(parser->nextEvent);
-		showEventInfo(m_events->currentIndex());
-		m_currentEventRow = parser->nextEvent;
-		//showEventInfo(m_events->model()->index(parser->nextEvent, 0));
+    parser = new VCalParser(response);
+    qDebug() << "populating list ...";
 
-		for (int j = 0; j < parser->m_todos.size(); j++) {
-			TTodo todo =parser->m_todos.at(j);
+    eventModel->fetchData(parser);
+    m_events->resizeRowsToContents();
+    emit visibleRow(parser->nextEvent);
+    showEventInfo(m_events->currentIndex());
+    m_currentEventRow = parser->nextEvent;
 
-			QTableWidgetItem *item1 = new QTableWidgetItem(todo.getSummary(), 0);
-			int row = m_todos->rowCount();
-			m_todos->insertRow(row);
-			m_todos->setItem(row, 0, item1);
+    for (int j = 0; j < parser->m_todos.size(); j++) {
+        TTodo todo =parser->m_todos.at(j);
 
-		}
+        QTableWidgetItem *item1 = new QTableWidgetItem(todo.getSummary(), 0);
+        int row = m_todos->rowCount();
+        m_todos->insertRow(row);
+        m_todos->setItem(row, 0, item1);
 
-		networkReply->deleteLater();
-	}
+    }
 
-	emit listPopulated();
+    networkReply->deleteLater();
+    emit listPopulated();
 }
 
+/**
+ * sets the http request to the calendar in motion
+ */
 void Calendar::getData()
 {
 	qDebug() << "fetching data...";
@@ -169,27 +183,55 @@ void Calendar::getData()
 	url.setScheme(settings->value("calendar/urlscheme").toString());
 	url.setHost(settings->value("calendar/hostname").toString());
 	url.setPath(settings->value("calendar/path").toString());
-	url.setUserName(settings->value("calendar/username").toString());
-	url.setPassword(settings->value("calendar/password").toString());
-	url.setPort(settings->value("calendar/port").toInt());
-	
-    //qDebug() << url.toString();
-	
-	networkManager.get(QNetworkRequest(url));
+        //url.setPort(settings->value("calendar/port").toInt());
+        //qDebug() << url;
+
+	networkReply = networkManager->get(QNetworkRequest(url));
+	connect(networkReply, SIGNAL(downloadProgress(qint64,qint64)),
+		this, SLOT(transmissionStats(qint64,qint64)));
 }
 
+/**
+ * takes care of the network connection on S60
+ * initialises a QNetworkAccessManager and connects the signals
+ */
 void Calendar::initNetwork()
 {
-  	QNetworkProxy proxy;
+#ifdef Q_OS_SYMBIAN
+    bDefaultIapSet = false;
+    if(!bDefaultIapSet) {
+        qt_SetDefaultIap();
+        bDefaultIapSet = true;
+    }
+#endif
+
+    networkManager = new QNetworkAccessManager();
+
+    if(settings->value("network/useProxy").toBool()) {
+        qDebug() << "setting proxy";
+
+        QNetworkProxy proxy;
 	proxy.setHostName(settings->value("network/proxyHost").toString());
 	proxy.setPort(settings->value("network/proxyPort").toInt());
-	proxy.setType(QNetworkProxy::HttpProxy);
-	
-	qDebug() << "Proxy: " << settings->value("network/proxyHost").toString() << ":" << settings->value("network/proxyPort").toInt();
-	
-	networkManager.setProxy(proxy);
+        proxy.setType(QNetworkProxy::HttpProxy);
+        //qDebug() << "Proxy: " << settings->value("network/proxyHost").toString() << ":" << settings->value("network/proxyPort").toInt();
+
+        networkManager->setProxy(proxy);
+    }
+
+    connect(networkManager, SIGNAL(finished(QNetworkReply*)),
+        this, SLOT(populateList(QNetworkReply*)));
+    connect(networkManager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+        this, SLOT(authenticate(QNetworkReply*, QAuthenticator*)));
+
+    authRetries = 0;
 }
 
+/**
+ * handles event-table navigation
+ * expands the current row to display event location
+ * resets the height of the previously selected row
+ */
 void Calendar::showEventInfo(const QModelIndex & index)
 {
 	// reset the height of the previously selected item
@@ -202,6 +244,10 @@ void Calendar::showEventInfo(const QModelIndex & index)
 	m_currentEventRow = index.row();
 }
 
+/**
+ * handles clicks on a todo
+ * TODO: implement something useful!
+ */
 void Calendar::showTodoInfo(int row, int col)
 {
 	qDebug() << "click at: " << row << ", " << col;
@@ -209,6 +255,10 @@ void Calendar::showTodoInfo(int row, int col)
 	qDebug() << todo.toString();
 }
 
+/**
+ * check to see if the necessary config values are set
+ * if not shows the config dialogue
+ */
 void Calendar::checkSettings()
 {	
 	if (!settings->contains("calendar/hostname")) {
@@ -218,10 +268,12 @@ void Calendar::checkSettings()
 		defineSettings("network");
 		return;
 	}
-	//qDebug() << "checkSettings, currentIndex: " << stackedWidget->currentIndex();
 	viewUpdatedCalendar();
 }
 
+/**
+ * prepares the config dialogues and places fields in a layout
+ */
 void Calendar::setupConfigLayouts()
 {
 		QFormLayout *settingsLayout = new QFormLayout();
@@ -247,20 +299,19 @@ void Calendar::setupConfigLayouts()
 		m_netDialog->setLayout(settingsLayout);
 }
 
+/**
+ * sets the properties of the table headers and clears the todos tale
+ * TODO: replace todo-table with MVC-architecture, move this method
+ */
 void Calendar::prepareTable()
 {
 	for (int i = m_todos->rowCount()-1; i >= 0; --i)
 		m_todos->removeRow(i);
-//	for (int i = m_events->rowCount()-1; i >= 0; --i)
-//		m_events->removeRow(i);
 
 	// headers
-	//QStringList eventLabels;
 	QStringList todoLabels;
-
-	//eventLabels << tr("Name") << tr("Time");
 	todoLabels << tr("Todo");
-//	m_events->setHorizontalHeaderLabels(eventLabels);
+
 	m_events->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
 	m_events->verticalHeader()->hide();
 
@@ -269,6 +320,9 @@ void Calendar::prepareTable()
 	m_todos->verticalHeader()->hide();
 }
 
+/**
+ * populates the config fields and changes the stack to the requested option
+ */
 void Calendar::defineSettings(const QString which) 
 {
 	if (which == QString("calendar")) {
@@ -293,6 +347,10 @@ void Calendar::defineSettings(const QString which)
 	}
 }
 
+/**
+ * SLOT
+ * saves the settings and returns to the calendar
+ */
 void Calendar::saveSettings() {
 
 	qDebug() << "saving settings ...";
@@ -315,20 +373,67 @@ void Calendar::saveSettings() {
 	viewUpdatedCalendar();
 }
 
+/**
+ * SLOT
+ * changes the widget stack to the calendar
+ * emits signal to update calendar data
+ */
 void Calendar::viewUpdatedCalendar()
 {
-	//qDebug() << stackedWidget->currentIndex();
 	stackedWidget->setCurrentIndex(2);
-
 	emit configChanged();
 }
 
+/**
+ * SLOT
+ */
 void Calendar::configSettings()
 {
 	defineSettings("calendar");
 }
 
+/**
+ * SLOT
+ */
 void Calendar::configNetwork()
 {
 	defineSettings("network");
+}
+
+void Calendar::outputError(QNetworkReply::NetworkError error)
+{
+    qDebug() << "network error" << networkReply->errorString() << "\n" << error;
+}
+
+/**
+ * output the current stats of the network transmission
+ * currently download-only
+ */
+void Calendar::transmissionStats(qint64 done, qint64 total)
+{
+    qDebug() << "network: " << done << " of " << total;
+}
+
+/**
+ * SLOT
+ * handle authentication for the networkManager
+ */
+void Calendar::authenticate(QNetworkReply *reply, QAuthenticator *auth)
+{
+    qDebug() << "auth required! (" << authRetries << ")";
+    auth->setUser(settings->value("calendar/username").toString());
+    auth->setPassword(settings->value("calendar/password").toString());
+
+	// it seems our credentials are wrong, abort and return to config
+    authRetries++;
+    if (authRetries > 2) {
+		emit authLoop();
+        reply->abort();
+        authRetries = 0;
+    }
+}
+
+void Calendar::outputError(const QString message)
+{
+    qDebug() << message;
 }

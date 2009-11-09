@@ -10,6 +10,5 @@ QModelIndex EventTableView::moveCursor(CursorAction cursorAction, Qt::KeyboardMo
 {
 	QModelIndex tmpIndex = QTableView::moveCursor(cursorAction, modifiers);
 	emit cursorChanged(tmpIndex);
-	//qDebug() << "moved Cursor";
 	return tmpIndex;
 }
