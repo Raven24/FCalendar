@@ -34,7 +34,6 @@ private:
 
 	QString		*m_rawData;
 	QStringList *m_rawTasks;
-	bool		nextDefined;
 };
 
 #endif // VCALPARSER_H

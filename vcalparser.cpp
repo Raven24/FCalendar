@@ -15,7 +15,6 @@ VCalParser::VCalParser()
 
 VCalParser::VCalParser(QString &vcaldata)
 {
-	nextDefined = false;
 	m_rawData = new QString(vcaldata);
 	getEvents();
 	getTodos();
@@ -59,6 +58,7 @@ void VCalParser::getEvents()
 	QList<QMap<QString, QString> > eventList = split("VEVENT");
 
 	TEvent event;
+	nextEvent.setStart(QDateTime::currentDateTime().addYears(100));
 
 	for (int i = 0; i < eventList.size(); i++) {
 		event.setUid(eventList.at(i)["UID"]);
@@ -80,20 +80,25 @@ void VCalParser::getEvents()
 		event.setLastModified(decodeDate(eventList.at(i)["LAST-MODIFIED"]));
 		event.setClass(eventList.at(i)["CLASS"]);
 		event.setStatus(eventList.at(i)["STATUS"]);
-		// qDebug() << event.toString();
 
-		if ((event.getStart() > QDateTime(QDateTime::currentDateTime())) && !nextDefined) {
-			event.setNextItem(true);
-			nextDefined = true;
-			nextEvent = event;
-		} else {
-			event.setNextItem(false);
+		// event is in the future
+		if(event.getStart() > QDateTime::currentDateTime()) {
+			if(event < nextEvent) {
+				nextEvent = event;
+			}
 		}
+
 		m_events.append(event);
 	}
 
 	qSort(m_events);
-	nextEventIndex = (m_events.indexOf(nextEvent) - 1);
+
+	if(nextEvent.isValid()) {
+		nextEventIndex = m_events.indexOf(nextEvent);
+	} else {
+		// there seems to be no reasonable event in the near future
+		nextEventIndex = m_events.size()-1;
+	}
 }
 
 void VCalParser::getTodos()
@@ -116,30 +121,13 @@ void VCalParser::getTodos()
 	}
 }
 
+/**
+ * convert the VCAL date/time string into something useful
+ */
 QDateTime VCalParser::decodeDate(QString date)
 {
 	if (date.size() < 9) {
-		int year	= date.mid(0, 4).toInt();
-		int month	= date.mid(4, 2).toInt();
-		int day		= date.mid(6, 2).toInt();
-
-		QDateTime retVal;
-		retVal.setDate(QDate(year, month, day));
-
-		return retVal;
+		return QDateTime::fromString(date, "yyyyMMdd");
 	}
-
-	QStringList splitted = date.split("T");
-	int year	= splitted.at(0).mid(0, 4).toInt();
-	int month	= splitted.at(0).mid(4, 2).toInt();
-	int day		= splitted.at(0).mid(6, 2).toInt();
-	int hours	= splitted.at(1).mid(0, 2).toInt();
-	int mins	= splitted.at(1).mid(2, 2).toInt();
-	int secs	= splitted.at(1).mid(4, 2).toInt();
-
-	QDateTime retVal;
-	retVal.setDate(QDate(year, month, day));
-	retVal.setTime(QTime(hours, mins, secs, 0));
-
-	return retVal;
+	return QDateTime::fromString(date, "yyyyMMddThhmmssZ");
 }

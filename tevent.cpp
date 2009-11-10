@@ -9,6 +9,7 @@
 TEvent::TEvent()
 {
 	m_nextItem = false;
+	setStart();
 }
 
 void TEvent::setStart(const QDateTime start)
@@ -58,10 +59,7 @@ QDateTime TEvent::getEnd()
 
 QString TEvent::getRemaining()
 {
-	int tstampNow = QDateTime::currentDateTime().toTime_t();
-	//qDebug() << getStart();
-	int tstampEvt = getStart().toTime_t();
-	double span = tstampEvt - tstampNow;
+	double span = m_start.secsTo(QDateTime::currentDateTime());
 	bool pos = (span>0)?true:false;
 
 	if(!pos) {
@@ -97,7 +95,7 @@ QString TEvent::getRemaining()
 		out = QString("...strange");
 	}
 
-	if(!pos) {
+	if(pos) {
 		out.prepend("-");
 	}
 
@@ -111,6 +109,18 @@ QString TEvent::toString()
 					 .arg(m_start.toString(), m_end.toString(), getRemaining());
 	out.append(evtOut);
 	return out;
+}
+
+/**
+ * basic sanity check
+ */
+bool TEvent::isValid()
+{
+	if( (getSummary().size() > 1) &&
+		(m_end.isValid())) {
+		return true;
+	}
+	return false;
 }
 
 bool TEvent::isNextItem()
