@@ -33,21 +33,19 @@ QList<QMap <QString, QString> > VCalParser::split(QString type)
 	QMap<QString, QString> temp;
 
 	for (int i = 0; i < lines.size(); ++i) {
-
-		if (lines.at(i).contains(QString("BEGIN:") + type, Qt::CaseInsensitive)) {
+		if (lines.at(i).contains("BEGIN:" + type)) {
 			// make a clean list for the new event
 			temp.clear();
 		}
-		if(!lines.at(i).startsWith(" ")) {
+		if(!lines.at(i).startsWith(" ") && lines.at(i).contains(":")) {
 			temp[lines.at(i).split(":").at(0)] = lines.at(i).split(":").at(1);
 		}
-		if (lines.at(i).contains(QString("END:") + type, Qt::CaseInsensitive)) {
+		if (lines.at(i).contains("END:" + type)) {
 			// event is over, append to itemsList
 			itemsList.append(temp);
 		}
 
 	}
-
 	return itemsList;
 }
 
