@@ -27,7 +27,7 @@ QList<QMap <QString, QString> > VCalParser::split()
 
 QList<QMap <QString, QString> > VCalParser::split(QString type)
 {
-	QStringList lines = m_rawData->split(QRegExp("\r\n"), QString::SkipEmptyParts);
+	QStringList lines = m_rawData->split(QRegExp("\n"), QString::SkipEmptyParts);
 
 	QList<QMap <QString, QString> > itemsList;
 	QMap<QString, QString> temp;

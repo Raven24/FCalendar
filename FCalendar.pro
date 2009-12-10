@@ -27,8 +27,8 @@ symbian {
     include(qts60main.pri)
     HEADERS += sym_iap_util.h
     INCLUDEPATH += $$APP_LAYER_SYSTEMINCLUDE
-    TARGET.CAPABILITY = "NetworkServices"
+    TARGET.CAPABILITY = "NetworkServices ReadUserData WriteUserData"
     
     # TARGET.UID3 = 0xA000A648
-	LIBS += -lesock -lconnmon # For IAP selection
+	LIBS += -lesock -lconnmon -linsock # For IAP selection
 }

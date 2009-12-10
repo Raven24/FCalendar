@@ -22,7 +22,7 @@
 Calendar::Calendar(QWidget *parent)
 	: QMainWindow(parent)
 {
-	settings = new QSettings("FCalendar", "FCalendar");
+	settings = new QSettings();
 	m_configDialog = new QWidget();
 	m_netDialog = new QWidget();
 	m_tabs = new QTabWidget();
@@ -84,17 +84,17 @@ Calendar::Calendar(QWidget *parent)
 			this, SLOT(showEventInfo(QModelIndex)));
 	connect(m_todos, SIGNAL(cellClicked(int,int)), this, SLOT(showTodoInfo(int, int)));
 
-        connect(this, SIGNAL(authLoop()),
-                this, SLOT(configSettings()));
-        connect(this, SIGNAL(visibleRow(int)),
-                m_events, SLOT(selectRow(int)));
+	connect(this, SIGNAL(authLoop()),
+			this, SLOT(configSettings()));
+	connect(this, SIGNAL(visibleRow(int)),
+			m_events, SLOT(selectRow(int)));
 
 	connect(configuration, SIGNAL(triggered()), this, SLOT(configSettings()));
 	connect(netSettings, SIGNAL(triggered()), this, SLOT(configNetwork()));
 	connect(calendar, SIGNAL(triggered()), this, SLOT(viewUpdatedCalendar()));
 	connect(updateCal, SIGNAL(triggered()), this, SLOT(viewUpdatedCalendar()));
         connect(this, SIGNAL(configChanged()),
-                this, SLOT(getData()));
+				this, SLOT(fetchCalendarData()));
 
 	connect(saveSettingsBtn, SIGNAL(clicked()), this, SLOT(saveSettings()));
 	connect(abortSettingsBtn, SIGNAL(clicked()), this, SLOT(viewUpdatedCalendar()));
@@ -111,7 +111,6 @@ Calendar::Calendar(QWidget *parent)
 	m_tabs->addTab(m_events, tr("Events"));
 	m_tabs->addTab(m_todos, tr("Todos"));
 
-        initNetwork();
 	getData();
 	setCentralWidget(stackedWidget);
 }
@@ -124,42 +123,29 @@ Calendar::~Calendar()
 }
 
 /**
- * test the network reply for errors
- * if everything went fine, hand the data over to the parser and
- * fill the table with data
+ * hand the data over to the parser and
+ * fill the table with items
  */
-void Calendar::populateList(QNetworkReply *reply)
+void Calendar::populateList()
 {
-    networkReply = reply;
-    connect(networkReply, SIGNAL(error(QNetworkReply::NetworkError)),
-                this, SLOT(outputError(QNetworkReply::NetworkError)));
+	prepareTable();
+	QString response;
+	data.seek(0);
 
-    if(networkReply->error()) {
-        qDebug() << "Calendar::populateList() \n\tnetwork error";
-        int code = networkReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-        if(code == 404) {
-            emit outputError(QString("404 - not found"));
-        } else {
-            qDebug() << "\t" << networkReply->errorString();
-        }
-        return;
-    }
+	while(!data.atEnd()) {
+		QString line = data.readLine();
+		response.append(line).append("\n");
+	}
 
-    prepareTable();
+	parser = new VCalParser(response);
 
-    QString response(networkReply->readAll());
-    //qDebug() << response;
-
-    parser = new VCalParser(response);
-    qDebug() << "populating list ...";
-
-    eventModel->fetchData(parser);
-    m_events->resizeRowsToContents();
+	eventModel->fetchData(parser);
+	m_events->resizeRowsToContents();
 	emit visibleRow(parser->nextEventIndex);
     showEventInfo(m_events->currentIndex());
 	m_currentEventRow = parser->nextEventIndex;
 
-    for (int j = 0; j < parser->m_todos.size(); j++) {
+	/*for (int j = 0; j < parser->m_todos.size(); j++) {
         TTodo todo =parser->m_todos.at(j);
 
         QTableWidgetItem *item1 = new QTableWidgetItem(todo.getSummary(), 0);
@@ -167,28 +153,44 @@ void Calendar::populateList(QNetworkReply *reply)
         m_todos->insertRow(row);
         m_todos->setItem(row, 0, item1);
 
-    }
+	}*/
 
-    networkReply->deleteLater();
-    emit listPopulated();
+	emit listPopulated();
 }
 
 /**
- * sets the http request to the calendar in motion
+ * make sure data is available for populateList()
+ * either cached data or request
  */
 void Calendar::getData()
 {
-	qDebug() << "fetching data...";
-	QUrl url;
-	url.setScheme(settings->value("calendar/urlscheme").toString());
-	url.setHost(settings->value("calendar/hostname").toString());
-	url.setPath(settings->value("calendar/path").toString());
-        //url.setPort(settings->value("calendar/port").toInt());
-        //qDebug() << url;
+	if(location.isEmpty()) {
+		outputError("calendar location not set");
+		return;
+	}
 
-	networkReply = networkManager->get(QNetworkRequest(url));
-	connect(networkReply, SIGNAL(downloadProgress(qint64,qint64)),
-		this, SLOT(transmissionStats(qint64,qint64)));
+	QDir path(location);
+	if(!path.exists()) {
+		if(!path.mkpath(location)) {
+			outputError("could not create storage path");
+			return;
+		}
+	}
+	QDir::setCurrent(location);
+	calendar.setFileName("calendar.ical");
+
+	if(!calendar.open(QIODevice::ReadWrite | QIODevice::Text)) {
+		outputError("failed to open calendar from file");
+		return;
+	}
+
+	data.setDevice(&calendar);
+
+	if(!calendar.exists() || (calendar.size() < qint64(100))) {
+		fetchCalendarData();
+	}
+
+	populateList();
 }
 
 /**
@@ -211,8 +213,8 @@ void Calendar::initNetwork()
         qDebug() << "setting proxy";
 
         QNetworkProxy proxy;
-	proxy.setHostName(settings->value("network/proxyHost").toString());
-	proxy.setPort(settings->value("network/proxyPort").toInt());
+		proxy.setHostName(settings->value("network/proxyHost").toString());
+		proxy.setPort(settings->value("network/proxyPort").toInt());
         proxy.setType(QNetworkProxy::HttpProxy);
         //qDebug() << "Proxy: " << settings->value("network/proxyHost").toString() << ":" << settings->value("network/proxyPort").toInt();
 
@@ -220,11 +222,66 @@ void Calendar::initNetwork()
     }
 
     connect(networkManager, SIGNAL(finished(QNetworkReply*)),
-        this, SLOT(populateList(QNetworkReply*)));
+		this, SLOT(saveCalendarData(QNetworkReply*)));
     connect(networkManager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
         this, SLOT(authenticate(QNetworkReply*, QAuthenticator*)));
 
     authRetries = 0;
+	qDebug() << "networking set up";
+}
+
+void Calendar::fetchCalendarData()
+{
+	initNetwork();
+
+	qDebug() << "fetching data...";
+	QUrl url;
+	url.setScheme(settings->value("calendar/urlscheme").toString());
+	url.setHost(settings->value("calendar/hostname").toString());
+	url.setPath(settings->value("calendar/path").toString());
+	//url.setPort(settings->value("calendar/port").toInt());
+
+	networkReply = networkManager->get(QNetworkRequest(url));
+	connect(networkReply, SIGNAL(downloadProgress(qint64,qint64)),
+			this, SLOT(transmissionStats(qint64,qint64)));
+	connect(networkReply, SIGNAL(error(QNetworkReply::NetworkError)),
+			this, SLOT(outputError(QNetworkReply::NetworkError)));
+
+}
+
+void Calendar::saveCalendarData()
+{
+	qDebug() << "networkReply finished";
+	saveCalendarData(networkReply);
+}
+
+void Calendar::saveCalendarData(QNetworkReply *reply)
+{
+	connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
+				this, SLOT(outputError(QNetworkReply::NetworkError)));
+
+	if(reply->error()) {
+		qDebug() << "Calendar::saveCalendarData() \n\tnetwork error";
+		int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+		if(code == 404) {
+			emit outputError(QString("404 - not found"));
+		} else {
+			qDebug() << "\t" << reply->errorString();
+		}
+		return;
+	}
+
+	QString response(reply->readAll());
+
+	data.seek(0);
+	data << response;
+	data.flush();
+	qDebug() << "new filesize: " << response.length();
+	calendar.resize(response.length());
+
+	reply->deleteLater();
+
+	populateList();
 }
 
 /**
@@ -268,7 +325,9 @@ void Calendar::checkSettings()
 		defineSettings("network");
 		return;
 	}
-	viewUpdatedCalendar();
+	location = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+
+	viewCalendar();
 }
 
 /**
@@ -380,8 +439,16 @@ void Calendar::saveSettings() {
  */
 void Calendar::viewUpdatedCalendar()
 {
-	stackedWidget->setCurrentIndex(2);
+	viewCalendar();
 	emit configChanged();
+}
+
+/**
+ * changes the widget stack to the calendar
+ */
+void Calendar::viewCalendar()
+{
+	stackedWidget->setCurrentIndex(2);
 }
 
 /**
@@ -400,6 +467,9 @@ void Calendar::configNetwork()
 	defineSettings("network");
 }
 
+/**
+ * debug function
+ */
 void Calendar::outputError(QNetworkReply::NetworkError error)
 {
     qDebug() << "network error" << networkReply->errorString() << "\n" << error;

@@ -33,41 +33,52 @@ public:
 	void setupConfigLayouts();
 
 public slots:
-        void authenticate(QNetworkReply* reply, QAuthenticator* auth);
-        void populateList(QNetworkReply *reply);
-	void showEventInfo(const QModelIndex & index);
-	void showTodoInfo(int row, int col);
-	void saveSettings();
-	void viewUpdatedCalendar();
+	void authenticate(QNetworkReply* reply, QAuthenticator* auth);
 	void configSettings();
 	void configNetwork();
+
+	void fetchCalendarData();
 	void getData();
-        void outputError(QNetworkReply::NetworkError error);
-        void transmissionStats(const qint64 done, const qint64 total);
-        void outputError(QString message);
+
+	void outputError(QNetworkReply::NetworkError error);
+	void outputError(QString message);
+
+	void saveCalendarData();
+	void saveCalendarData(QNetworkReply *reply);
+	void saveSettings();
+	void showEventInfo(const QModelIndex & index);
+	void showTodoInfo(int row, int col);
+
+	void transmissionStats(const qint64 done, const qint64 total);
+	void viewUpdatedCalendar();
 
 signals:
 	void listPopulated();
 	void configChanged();
 	void visibleRow(int row);
-        void authLoop();
+	void authLoop();
 
 private:
 	void checkSettings();
+	void populateList();
 	void prepareTable();
+	void viewCalendar();
   
 	EventTableView *m_events;
 	QTableWidget *m_todos;
 	QTabWidget *m_tabs;
 	QStackedWidget *stackedWidget;
-        QNetworkAccessManager *networkManager;
-        QNetworkReply *networkReply;
+	QNetworkAccessManager *networkManager;
+	QNetworkReply *networkReply;
 	VCalParser *parser;
 	EventModel *eventModel;
 	QSettings *settings;
+	QString location;
+	QFile calendar;
+	QTextStream data;
 	int m_nextItemRow;
 	int m_currentEventRow;
-        int authRetries;
+	int authRetries;
 	QWidget *m_configDialog;
 	QWidget *m_netDialog;
 	QLineEdit *urlscheme, *hostname, *port, *path, *username, *password, *proxyHost, *proxyPort;
