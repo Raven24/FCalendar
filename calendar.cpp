@@ -326,6 +326,10 @@ void Calendar::checkSettings()
 		return;
 	}
 	location = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#ifdef Q_OS_SYMBIAN
+	location = QDesktopServices::storageLocation(QDesktopServices::DataLocation).left(1);
+	location.append(":/Data/FCalendar");
+#endif
 
 	viewCalendar();
 }
