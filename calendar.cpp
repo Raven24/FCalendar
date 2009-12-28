@@ -137,7 +137,7 @@ void Calendar::populateList()
 		response.append(line).append("\n");
 	}
 
-	parser = new VCalParser(response);
+	parser = new VCalParser(&response);
 
 	eventModel->fetchData(parser);
 	m_events->resizeRowsToContents();

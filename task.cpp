@@ -7,15 +7,14 @@ Task::Task()
 {
 }
 
-Task::Task(QString uid)
+Task::Task(QString uid):
+		m_uid(uid)
 {
-	m_uid = uid;
 }
 
-Task::Task(QString summ, QString desc)
+Task::Task(QString summ, QString desc):
+		m_summary(summ), m_description(desc)
 {
-	m_summary = summ;
-	m_description = desc;
 }
 
 QString Task::getUid()

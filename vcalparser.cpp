@@ -13,9 +13,9 @@ VCalParser::VCalParser()
 	qDebug() << "not possible";
 }
 
-VCalParser::VCalParser(QString &vcaldata)
+VCalParser::VCalParser(QString *vcaldata):
+		m_rawData(vcaldata)
 {
-	m_rawData = new QString(vcaldata);
 	getEvents();
 	getTodos();
 }
@@ -54,11 +54,10 @@ void VCalParser::getEvents()
 	qDebug() << "parsing calendar (events) ...";
 
 	QList<QMap<QString, QString> > eventList = split("VEVENT");
-
-	TEvent event;
 	nextEvent.setStart(QDateTime::currentDateTime().addYears(100));
 
 	for (int i = 0; i < eventList.size(); i++) {
+		TEvent event;
 		event.setUid(eventList.at(i)["UID"]);
 		event.setDescription(eventList.at(i)["DESCRIPTION"]);
 		event.setSummary(eventList.at(i)["SUMMARY"]);
@@ -103,9 +102,9 @@ void VCalParser::getTodos()
 {
 	qDebug() << "parsing calendar (todos) ...";
 	QList<QMap<QString, QString> > todoList = split("VTODO");
-	TTodo todo;
 
 	for (int i = 0; i < todoList.size(); i++) {
+		TTodo todo;
 		todo.setUid(todoList.at(i)["UID"]);
 		todo.setDescription(todoList.at(i)["DESCRIPTION"]);
 		todo.setSummary(todoList.at(i)["SUMMARY"]);

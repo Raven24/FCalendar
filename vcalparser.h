@@ -17,7 +17,7 @@ class VCalParser
 {
 public:
     VCalParser();
-	VCalParser(QString &vcaldata);
+	VCalParser(QString *vcaldata);
 
 	void getEvents();
 	void getTodos();
