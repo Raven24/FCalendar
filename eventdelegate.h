@@ -3,7 +3,7 @@
 
 #include <QtGui>
 
-class EventDelegate : public QAbstractItemDelegate
+class EventDelegate : public QStyledItemDelegate
 {
 		Q_OBJECT
 

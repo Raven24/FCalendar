@@ -41,6 +41,7 @@ Calendar::Calendar(QWidget *parent)
 	proxyHost = new QLineEdit();
 	proxyPort = new QLineEdit();
 	useProxy = new QCheckBox();
+	useTodos = new QCheckBox();
 	saveSettingsBtn = new QPushButton(tr("Save"));
 	abortSettingsBtn = new QPushButton(tr("Abort"));
 	saveNetworkBtn = new QPushButton(tr("Save"));
@@ -109,7 +110,8 @@ Calendar::Calendar(QWidget *parent)
 
 	// tab bar
 	m_tabs->addTab(m_events, tr("Events"));
-	m_tabs->addTab(m_todos, tr("Todos"));
+	if(settings->value("ui/useTodos", false).toBool())
+		m_tabs->addTab(m_todos, tr("Todos"));
 
 	getData();
 	setCentralWidget(stackedWidget);
@@ -132,11 +134,13 @@ void Calendar::populateList()
 	QString response;
 	data.seek(0);
 
+	data.setCodec("UTF-8");
+
 	while(!data.atEnd()) {
 		QString line = data.readLine();
 		response.append(line).append("\n");
 	}
-
+	response = data.codec()->toUnicode(response.toAscii());
 	parser = new VCalParser(&response);
 
 	eventModel->fetchData(parser);
@@ -168,6 +172,8 @@ void Calendar::getData()
 		outputError("calendar location not set");
 		return;
 	}
+
+	qDebug() << location;
 
 	QDir path(location);
 	if(!path.exists()) {
@@ -271,6 +277,8 @@ void Calendar::saveCalendarData(QNetworkReply *reply)
 		return;
 	}
 
+	qDebug() << reply->header(QNetworkRequest::ContentTypeHeader);
+
 	QString response(reply->readAll());
 
 	data.seek(0);
@@ -347,6 +355,7 @@ void Calendar::setupConfigLayouts()
 		settingsLayout->addRow(tr("Path"), path);
 		settingsLayout->addRow(tr("Username"), username),
 		settingsLayout->addRow(tr("Password"), password);
+		settingsLayout->addRow(tr("Use Todos"), useTodos);
 		settingsLayout->addRow(saveSettingsBtn);
 		settingsLayout->addRow(abortSettingsBtn);
 
@@ -377,6 +386,7 @@ void Calendar::prepareTable()
 
 	m_events->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
 	m_events->verticalHeader()->hide();
+	m_events->setAlternatingRowColors(true);
 
 	m_todos->setHorizontalHeaderLabels(todoLabels);
 	m_todos->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
@@ -396,6 +406,7 @@ void Calendar::defineSettings(const QString which)
 		path->setText(settings->value("calendar/path", "/calendar.ical").toString());
 		username->setText(settings->value("calendar/username", "").toString());
 		password->setText(settings->value("calendar/password", "").toString());
+		useTodos->setChecked(settings->value("ui/useTodos", false).toBool());
 
 		stackedWidget->setCurrentIndex(0);
 
@@ -424,7 +435,8 @@ void Calendar::saveSettings() {
 	settings->setValue("calendar/path", path->text());
 	settings->setValue("calendar/username", username->text());
 	settings->setValue("calendar/password", password->text());
-	
+	settings->setValue("ui/useTodos", useTodos->isChecked());
+
 	settings->setValue("network/proxyHost", proxyHost->text());
 	settings->setValue("network/useProxy", useProxy->isChecked());
 #ifndef Q_OS_SYMBIAN

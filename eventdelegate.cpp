@@ -4,26 +4,21 @@
 #include "eventmodel.h"
 
 EventDelegate::EventDelegate(QObject *parent)
-		: QAbstractItemDelegate(parent)
+		: QStyledItemDelegate(parent)
 {
 }
 
 void EventDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	if (option.state & QStyle::State_Selected)
-		painter->fillRect(option.rect, option.palette.highlight());
+	QStyledItemDelegate::paint(painter, option, index);
 
 	painter->save();
-	painter->setRenderHint(QPainter::Antialiasing, true);
+	painter->setRenderHint(QPainter::Antialiasing);
 
 	QColor c	= option.palette.text().color();
 //	int role	= EventModel::RoleSummary;
 	QRect basicRect = QRect(QPoint(option.rect.x(), option.rect.y()),
 							QSize(option.rect.width()-2, 12));
-
-	if (option.state & QStyle::State_Selected) {
-		c = option.palette.highlightedText().color();
-	}
 
 	painter->setPen(c);
 	QFont font = painter->font();

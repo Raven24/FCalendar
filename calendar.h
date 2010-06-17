@@ -83,7 +83,7 @@ private:
 	QWidget *m_netDialog;
 	QLineEdit *urlscheme, *hostname, *port, *path, *username, *password, *proxyHost, *proxyPort;
 	QPushButton *saveSettingsBtn, *saveNetworkBtn, *abortSettingsBtn, *abortNetworkBtn;
-	QCheckBox *useProxy;
+	QCheckBox *useProxy, *useTodos;
 	
 #ifdef Q_OS_SYMBIAN
 	bool bDefaultIapSet;
