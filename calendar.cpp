@@ -73,7 +73,6 @@ Calendar::Calendar(QWidget *parent)
 	EventDelegate *eventDelegate = new EventDelegate(this);
 
 	m_events = new EventTableView();
-	//m_events = new QTableView();
 	m_events->setModel(eventModel);
 	m_events->setItemDelegate(eventDelegate);
 
@@ -108,13 +107,18 @@ Calendar::Calendar(QWidget *parent)
 	m_todos->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_todos->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-	// tab bar
-	m_tabs->addTab(m_events, tr("Events"));
-	if(settings->value("ui/useTodos", false).toBool())
+	// tab bar or not
+	if(settings->value("ui/useTodos", false).toBool()) {
+		m_tabs->addTab(m_events, tr("Events"));
 		m_tabs->addTab(m_todos, tr("Todos"));
+	} else {
+		stackedWidget->removeWidget(m_tabs);
+		stackedWidget->addWidget(m_events);
+	}
 
 	getData();
 	setCentralWidget(stackedWidget);
+	viewCalendar();
 }
 
 /**
@@ -153,7 +157,7 @@ void Calendar::populateList()
         TTodo todo =parser->m_todos.at(j);
 
         QTableWidgetItem *item1 = new QTableWidgetItem(todo.getSummary(), 0);
-        int row = m_todos->rowCount();
+		int rohttp://suche.upc.at/upcatassist/dnsassist/main/?domain=qstackedwidgetw = m_todos->rowCount();
         m_todos->insertRow(row);
         m_todos->setItem(row, 0, item1);
 
@@ -408,7 +412,7 @@ void Calendar::defineSettings(const QString which)
 		password->setText(settings->value("calendar/password", "").toString());
 		useTodos->setChecked(settings->value("ui/useTodos", false).toBool());
 
-		stackedWidget->setCurrentIndex(0);
+		stackedWidget->setCurrentIndex(stackedWidget->indexOf(m_configDialog));
 
 	} else if (which == QString("network")) {
 
@@ -416,7 +420,7 @@ void Calendar::defineSettings(const QString which)
 		proxyPort->setText(settings->value("network/proxyPort", "").toString());
 		useProxy->setChecked(settings->value("network/useProxy", false).toBool());
 
-		stackedWidget->setCurrentIndex(1);
+		stackedWidget->setCurrentIndex(stackedWidget->indexOf(m_netDialog));
 
 	}
 }
@@ -464,7 +468,13 @@ void Calendar::viewUpdatedCalendar()
  */
 void Calendar::viewCalendar()
 {
-	stackedWidget->setCurrentIndex(2);
+	int calId;
+	if(settings->value("ui/useTodos", false).toBool())
+		calId = stackedWidget->indexOf(m_tabs);
+	else
+		calId = stackedWidget->indexOf(m_events);
+
+	stackedWidget->setCurrentIndex(calId);
 }
 
 /**
