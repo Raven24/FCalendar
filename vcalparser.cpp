@@ -51,7 +51,7 @@ QList<QMap <QString, QString> > VCalParser::split(QString type)
 
 void VCalParser::getEvents()
 {
-	qDebug() << "parsing calendar (events) ...";
+	qDebug() << "[calendar] parsing events";
 
 	QList<QMap<QString, QString> > eventList = split("VEVENT");
 	nextEvent.setStart(QDateTime::currentDateTime().addYears(100));
@@ -100,7 +100,7 @@ void VCalParser::getEvents()
 
 void VCalParser::getTodos()
 {
-	qDebug() << "parsing calendar (todos) ...";
+	qDebug() << "[calendar] parsing todos";
 	QList<QMap<QString, QString> > todoList = split("VTODO");
 
 	for (int i = 0; i < todoList.size(); i++) {

@@ -47,7 +47,12 @@ Calendar::Calendar(QWidget *parent)
 	saveNetworkBtn = new QPushButton(tr("Save"));
 	abortNetworkBtn = new QPushButton(tr("Abort"));
 
+	m_nextItemRow = 0;
+	m_currentEventRow = 0;
+	authRetries = 0;
+
 	setupConfigLayouts();
+	qDebug() << "[startup] checking for settings";
 	checkSettings();
 
 	// context menu
@@ -69,6 +74,8 @@ Calendar::Calendar(QWidget *parent)
 	setContextMenuPolicy(Qt::ActionsContextMenu);
 #endif
 
+	qDebug() << "[startup] setting up MVC architecture";
+
 	eventModel = new EventModel(this);
 	EventDelegate *eventDelegate = new EventDelegate(this);
 
@@ -77,6 +84,8 @@ Calendar::Calendar(QWidget *parent)
 	m_events->setItemDelegate(eventDelegate);
 
 	m_todos = new QTableWidget(0, 1);
+
+	qDebug() << "[startup] connecting signals and slots";
 
 	//connect signals
 	connect(m_events, SIGNAL(activated(QModelIndex)), this, SLOT(showEventInfo(QModelIndex)));
@@ -111,14 +120,18 @@ Calendar::Calendar(QWidget *parent)
 	if(settings->value("ui/useTodos", false).toBool()) {
 		m_tabs->addTab(m_events, tr("Events"));
 		m_tabs->addTab(m_todos, tr("Todos"));
+		stackedWidget->setCurrentWidget(m_tabs);
 	} else {
 		stackedWidget->removeWidget(m_tabs);
 		stackedWidget->addWidget(m_events);
+		stackedWidget->setCurrentWidget(m_events);
 	}
+
+	qDebug() << "[startup] getting data";
 
 	getData();
 	setCentralWidget(stackedWidget);
-	viewCalendar();
+
 }
 
 /**
@@ -177,7 +190,7 @@ void Calendar::getData()
 		return;
 	}
 
-	qDebug() << location;
+	//qDebug() << location;
 
 	QDir path(location);
 	if(!path.exists()) {
@@ -209,6 +222,8 @@ void Calendar::getData()
  */
 void Calendar::initNetwork()
 {
+	qDebug() << "[net] setting up network";
+
 #ifdef Q_OS_SYMBIAN
     bDefaultIapSet = false;
     if(!bDefaultIapSet) {
@@ -237,14 +252,14 @@ void Calendar::initNetwork()
         this, SLOT(authenticate(QNetworkReply*, QAuthenticator*)));
 
     authRetries = 0;
-	qDebug() << "networking set up";
+	qDebug() << "[net] networking set up";
 }
 
 void Calendar::fetchCalendarData()
 {
 	initNetwork();
 
-	qDebug() << "fetching data...";
+	qDebug() << "[net] fetching data";
 	QUrl url;
 	url.setScheme(settings->value("calendar/urlscheme").toString());
 	url.setHost(settings->value("calendar/hostname").toString());
@@ -261,7 +276,7 @@ void Calendar::fetchCalendarData()
 
 void Calendar::saveCalendarData()
 {
-	qDebug() << "networkReply finished";
+	//qDebug() << "networkReply finished";
 	saveCalendarData(networkReply);
 }
 
@@ -281,14 +296,14 @@ void Calendar::saveCalendarData(QNetworkReply *reply)
 		return;
 	}
 
-	qDebug() << reply->header(QNetworkRequest::ContentTypeHeader);
+	//qDebug() << reply->header(QNetworkRequest::ContentTypeHeader);
 
 	QString response(reply->readAll());
 
 	data.seek(0);
 	data << response;
 	data.flush();
-	qDebug() << "new filesize: " << response.length();
+	qDebug() << "[info] new filesize: " << response.length();
 	calendar.resize(response.length());
 
 	reply->deleteLater();
@@ -331,9 +346,11 @@ void Calendar::showTodoInfo(int row, int col)
 void Calendar::checkSettings()
 {	
 	if (!settings->contains("calendar/hostname")) {
+		qDebug() << "no calendar information specified";
 		defineSettings("calendar");
 		return;
 	} else if(!settings->contains("network/proxyHost")) {
+		qDebug() << "no network information specified";
 		defineSettings("network");
 		return;
 	}
@@ -343,7 +360,8 @@ void Calendar::checkSettings()
 	location.append(":/Data/FCalendar");
 #endif
 
-	viewCalendar();
+	qDebug() << "[startup] settings seem fine";
+
 }
 
 /**
@@ -403,6 +421,7 @@ void Calendar::prepareTable()
 void Calendar::defineSettings(const QString which) 
 {
 	if (which == QString("calendar")) {
+		qDebug() << "[settings] calendar";
 
 		urlscheme->setText(settings->value("calendar/urlscheme", "http").toString());
 		hostname->setText(settings->value("calendar/hostname").toString());
@@ -412,15 +431,16 @@ void Calendar::defineSettings(const QString which)
 		password->setText(settings->value("calendar/password", "").toString());
 		useTodos->setChecked(settings->value("ui/useTodos", false).toBool());
 
-		stackedWidget->setCurrentIndex(stackedWidget->indexOf(m_configDialog));
+		stackedWidget->setCurrentWidget(m_configDialog);
 
 	} else if (which == QString("network")) {
+		qDebug() << "[settings] networking";
 
 		proxyHost->setText(settings->value("network/proxyHost", "").toString());
 		proxyPort->setText(settings->value("network/proxyPort", "").toString());
 		useProxy->setChecked(settings->value("network/useProxy", false).toBool());
 
-		stackedWidget->setCurrentIndex(stackedWidget->indexOf(m_netDialog));
+		stackedWidget->setCurrentWidget(m_netDialog);
 
 	}
 }
@@ -431,7 +451,7 @@ void Calendar::defineSettings(const QString which)
  */
 void Calendar::saveSettings() {
 
-	qDebug() << "saving settings ...";
+	qDebug() << "[settings] saving";
 
 	settings->setValue("calendar/urlscheme", urlscheme->text());
 	settings->setValue("calendar/hostname", hostname->text());
@@ -475,6 +495,10 @@ void Calendar::viewCalendar()
 		calId = stackedWidget->indexOf(m_events);
 
 	stackedWidget->setCurrentIndex(calId);
+
+	if((!m_events->hasFocus())&&m_events->isVisible())
+		m_events->setFocus();
+
 }
 
 /**
@@ -498,7 +522,7 @@ void Calendar::configNetwork()
  */
 void Calendar::outputError(QNetworkReply::NetworkError error)
 {
-    qDebug() << "network error" << networkReply->errorString() << "\n" << error;
+	qDebug() << "[error] network error" << networkReply->errorString() << "\n" << error;
 }
 
 /**
@@ -507,7 +531,7 @@ void Calendar::outputError(QNetworkReply::NetworkError error)
  */
 void Calendar::transmissionStats(qint64 done, qint64 total)
 {
-    qDebug() << "network: " << done << " of " << total;
+	qDebug() << "[info] network: " << done << " of " << total;
 }
 
 /**
@@ -516,7 +540,7 @@ void Calendar::transmissionStats(qint64 done, qint64 total)
  */
 void Calendar::authenticate(QNetworkReply *reply, QAuthenticator *auth)
 {
-    qDebug() << "auth required! (" << authRetries << ")";
+	qDebug() << "[error] auth required! (" << authRetries << ")";
     auth->setUser(settings->value("calendar/username").toString());
     auth->setPassword(settings->value("calendar/password").toString());
 
