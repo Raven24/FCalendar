@@ -1,24 +1,19 @@
 #include <QtGui>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
+#include <QtNetwork>
 
 #include "vcalparser.h"
 #include "eventmodel.h"
 #include "eventtableview.h"
+#include "task.h"
+#include "tevent.h"
+#include "ttodo.h"
+#include "eventdelegate.h"
+#include "statusindicator.h"
 
 #ifndef CALENDAR_H
 #define CALENDAR_H
-
-#include <QtGui/QMainWindow>
-
-class QWidget;
-class QStackedWidget;
-class QTableWidget;
-class QTableWidgetItem;
-class QLineEdit;
-class QPushButton;
-class QCheckBox;
-class QNetworkReply;
 
 class Calendar : public QMainWindow
 {
@@ -79,11 +74,11 @@ private:
 	int m_nextItemRow;
 	int m_currentEventRow;
 	int authRetries;
-	QWidget *m_configDialog;
-	QWidget *m_netDialog;
+        QWidget *m_configDialog, *m_netDialog, *m_mainWidget;
 	QLineEdit *urlscheme, *hostname, *port, *path, *username, *password, *proxyHost, *proxyPort;
 	QPushButton *saveSettingsBtn, *saveNetworkBtn, *abortSettingsBtn, *abortNetworkBtn;
 	QCheckBox *useProxy, *useTodos;
+        StatusIndicator *status;
 	
 #ifdef Q_OS_SYMBIAN
 	bool bDefaultIapSet;

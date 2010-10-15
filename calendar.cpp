@@ -1,15 +1,4 @@
 #include "calendar.h"
-#include "task.h"
-#include "tevent.h"
-#include "ttodo.h"
-#include "vcalparser.h"
-#include "eventdelegate.h"
-#include "eventmodel.h"
-#include "eventtableview.h"
-
-#include <QtCore>
-#include <QtGui>
-#include <QtNetwork>
 
 #ifdef Q_OS_SYMBIAN
 #include "sym_iap_util.h"
@@ -22,15 +11,24 @@
 Calendar::Calendar(QWidget *parent)
 	: QMainWindow(parent)
 {
-	settings = new QSettings();
-	m_configDialog = new QWidget();
-	m_netDialog = new QWidget();
-	m_tabs = new QTabWidget();
+		settings    = new QSettings();
+		m_tabs      = new QTabWidget();
+		status      = new StatusIndicator();
+		m_configDialog  = new QWidget();
+		m_netDialog     = new QWidget();
+		m_mainWidget    = new QWidget();
 
 	stackedWidget = new QStackedWidget();
 	stackedWidget->addWidget(m_configDialog);
 	stackedWidget->addWidget(m_netDialog);
-	stackedWidget->addWidget(m_tabs);
+		stackedWidget->addWidget(m_tabs);
+
+		QVBoxLayout *mainLayout = new QVBoxLayout();
+		mainLayout->addWidget(status, 1);
+		mainLayout->addWidget(stackedWidget, 10);
+		m_mainWidget->setLayout(mainLayout);
+
+		status->setTitle(tr("Calendar"));
 
 	urlscheme = new QLineEdit();
 	hostname = new QLineEdit();
@@ -56,21 +54,21 @@ Calendar::Calendar(QWidget *parent)
 	checkSettings();
 
 	// context menu
-	QAction *configuration = new QAction("Configuration", this);
-	QAction *netSettings = new QAction("Net settings", this);
-	QAction *calendar = new QAction("Display Calendar", this);
+	QAction *configuration = new QAction(tr("Settings"), this);
+	QAction *netSettings = new QAction(tr("Network"), this);
+	QAction *calendar = new QAction(tr("Calendar"), this);
 	QAction *updateCal = new QAction("Update Calendar", this);
 
 #ifdef Q_OS_SYMBIAN
 	menuBar()->addAction(configuration);
 	menuBar()->addAction(netSettings);
 	menuBar()->addAction(calendar);
-	menuBar()->addAction(updateCal);
+	//menuBar()->addAction(updateCal);
 #else
 	addAction(configuration);
 	addAction(netSettings);
 	addAction(calendar);
-	addAction(updateCal);
+	//addAction(updateCal);
 	setContextMenuPolicy(Qt::ActionsContextMenu);
 #endif
 
@@ -128,10 +126,9 @@ Calendar::Calendar(QWidget *parent)
 	}
 
 	qDebug() << "[startup] getting data";
-
 	getData();
-	setCentralWidget(stackedWidget);
 
+		setCentralWidget(m_mainWidget);
 }
 
 /**
@@ -163,7 +160,7 @@ void Calendar::populateList()
 	eventModel->fetchData(parser);
 	m_events->resizeRowsToContents();
 	emit visibleRow(parser->nextEventIndex);
-    showEventInfo(m_events->currentIndex());
+		showEventInfo(m_events->currentIndex());
 	m_currentEventRow = parser->nextEventIndex;
 
 	/*for (int j = 0; j < parser->m_todos.size(); j++) {
@@ -177,6 +174,7 @@ void Calendar::populateList()
 	}*/
 
 	emit listPopulated();
+	status->hideIndicator();
 }
 
 /**
@@ -185,6 +183,8 @@ void Calendar::populateList()
  */
 void Calendar::getData()
 {
+	status->showIndicator();
+
 	if(location.isEmpty()) {
 		outputError("calendar location not set");
 		return;
@@ -235,7 +235,7 @@ void Calendar::initNetwork()
     networkManager = new QNetworkAccessManager();
 
     if(settings->value("network/useProxy").toBool()) {
-        qDebug() << "setting proxy";
+		qDebug() << "[net] setting proxy";
 
         QNetworkProxy proxy;
 		proxy.setHostName(settings->value("network/proxyHost").toString());
@@ -257,6 +257,8 @@ void Calendar::initNetwork()
 
 void Calendar::fetchCalendarData()
 {
+	status->showIndicator();
+
 	initNetwork();
 
 	qDebug() << "[net] fetching data";
@@ -346,11 +348,11 @@ void Calendar::showTodoInfo(int row, int col)
 void Calendar::checkSettings()
 {	
 	if (!settings->contains("calendar/hostname")) {
-		qDebug() << "no calendar information specified";
+				qDebug() << "[settings] no calendar information specified";
 		defineSettings("calendar");
 		return;
 	} else if(!settings->contains("network/proxyHost")) {
-		qDebug() << "no network information specified";
+				qDebug() << "[settings] no network information specified";
 		defineSettings("network");
 		return;
 	}
@@ -452,6 +454,7 @@ void Calendar::defineSettings(const QString which)
 void Calendar::saveSettings() {
 
 	qDebug() << "[settings] saving";
+		status->toggleIndicator();
 
 	settings->setValue("calendar/urlscheme", urlscheme->text());
 	settings->setValue("calendar/hostname", hostname->text());
@@ -468,7 +471,7 @@ void Calendar::saveSettings() {
 #else
 	settings->setValue("network/defaultIAP", "");
 #endif
-
+		status->toggleIndicator();
 	viewUpdatedCalendar();
 }
 
@@ -498,7 +501,7 @@ void Calendar::viewCalendar()
 
 	if((!m_events->hasFocus())&&m_events->isVisible())
 		m_events->setFocus();
-
+		status->setTitle(tr("Calendar"));
 }
 
 /**
@@ -506,6 +509,7 @@ void Calendar::viewCalendar()
  */
 void Calendar::configSettings()
 {
+		status->setTitle(tr("Settings"));
 	defineSettings("calendar");
 }
 
@@ -514,6 +518,7 @@ void Calendar::configSettings()
  */
 void Calendar::configNetwork()
 {
+	status->setTitle(tr("Network"));
 	defineSettings("network");
 }
 
@@ -532,6 +537,7 @@ void Calendar::outputError(QNetworkReply::NetworkError error)
 void Calendar::transmissionStats(qint64 done, qint64 total)
 {
 	qDebug() << "[info] network: " << done << " of " << total;
+	status->updateProgress((int) done, (int) total);
 }
 
 /**
@@ -556,4 +562,5 @@ void Calendar::authenticate(QNetworkReply *reply, QAuthenticator *auth)
 void Calendar::outputError(const QString message)
 {
     qDebug() << message;
+	status->toggleIndicator();
 }

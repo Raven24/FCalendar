@@ -11,7 +11,8 @@ SOURCES += main.cpp \
     ttodo.cpp \
     eventmodel.cpp \
 	eventdelegate.cpp\
-	eventtableview.cpp
+	eventtableview.cpp \
+    statusindicator.cpp
 HEADERS += calendar.h \
     vcalparser.h \
     task.h \
@@ -19,7 +20,8 @@ HEADERS += calendar.h \
     ttodo.h \
     eventmodel.h \
 	eventdelegate.h \
-	eventtableview.h
+	eventtableview.h \
+    statusindicator.h
 FORMS += 
 QT += network
 
@@ -32,3 +34,6 @@ symbian {
     # TARGET.UID3 = 0xA000A648
 	LIBS += -lesock -lconnmon -linsock # For IAP selection
 }
+
+RESOURCES += \
+    app.qrc
