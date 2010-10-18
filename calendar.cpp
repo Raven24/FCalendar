@@ -26,6 +26,7 @@ Calendar::Calendar(QWidget *parent)
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	mainLayout->addWidget(status, 1);
 	mainLayout->addWidget(stackedWidget, 10);
+	mainLayout->setSpacing(0);
 	m_mainWidget->setLayout(mainLayout);
 
 	status->setTitle(tr("Calendar"));

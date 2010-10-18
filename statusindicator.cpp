@@ -49,7 +49,9 @@ void StatusIndicator::hideIndicator()
 
 void StatusIndicator::setTitle(const QString _title)
 {
-	title->setText(_title);
+	QString text(_title);
+	text.prepend("<b>").append("</b>");
+	title->setText(text);
 	stackLayout->setCurrentWidget(title);
 }
 
