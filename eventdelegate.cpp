@@ -15,6 +15,8 @@ void EventDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 	painter->save();
 	painter->setRenderHint(QPainter::Antialiasing);
 
+	qDebug() << option.palette.text();
+
 	QColor c	= option.palette.text().color();
 //	int role	= EventModel::RoleSummary;
 	QRect basicRect = QRect(QPoint(option.rect.x(), option.rect.y()),

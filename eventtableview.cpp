@@ -4,6 +4,7 @@
 
 EventTableView::EventTableView()
 {
+	setShowGrid(false);
 }
 
 QModelIndex EventTableView::moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) 

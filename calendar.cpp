@@ -11,24 +11,24 @@
 Calendar::Calendar(QWidget *parent)
 	: QMainWindow(parent)
 {
-		settings    = new QSettings();
-		m_tabs      = new QTabWidget();
-		status      = new StatusIndicator();
-		m_configDialog  = new QWidget();
-		m_netDialog     = new QWidget();
-		m_mainWidget    = new QWidget();
+	settings    = new QSettings();
+	m_tabs      = new QTabWidget();
+	status      = new StatusIndicator();
+	m_configDialog  = new QWidget();
+	m_netDialog     = new QWidget();
+	m_mainWidget    = new QWidget();
 
 	stackedWidget = new QStackedWidget();
 	stackedWidget->addWidget(m_configDialog);
 	stackedWidget->addWidget(m_netDialog);
-		stackedWidget->addWidget(m_tabs);
+	stackedWidget->addWidget(m_tabs);
 
-		QVBoxLayout *mainLayout = new QVBoxLayout();
-		mainLayout->addWidget(status, 1);
-		mainLayout->addWidget(stackedWidget, 10);
-		m_mainWidget->setLayout(mainLayout);
+	QVBoxLayout *mainLayout = new QVBoxLayout();
+	mainLayout->addWidget(status, 1);
+	mainLayout->addWidget(stackedWidget, 10);
+	m_mainWidget->setLayout(mainLayout);
 
-		status->setTitle(tr("Calendar"));
+	status->setTitle(tr("Calendar"));
 
 	urlscheme = new QLineEdit();
 	hostname = new QLineEdit();
@@ -128,7 +128,7 @@ Calendar::Calendar(QWidget *parent)
 	qDebug() << "[startup] getting data";
 	getData();
 
-		setCentralWidget(m_mainWidget);
+	setCentralWidget(m_mainWidget);
 }
 
 /**
