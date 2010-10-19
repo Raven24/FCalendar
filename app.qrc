@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file alias="loading.gif">images/loading.gif</file>
+        <file alias="calendar.png">images/calendar.png</file>
+        <file alias="network.png">images/network.png</file>
+        <file alias="settings.png">images/settings.png</file>
+        <file alias="quit.png">images/quit.png</file>
     </qresource>
 </RCC>

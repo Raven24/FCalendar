@@ -13,10 +13,12 @@ Calendar::Calendar(QWidget *parent)
 {
 	settings    = new QSettings();
 	m_tabs      = new QTabWidget();
-	status      = new StatusIndicator();
 	m_configDialog  = new QWidget();
 	m_netDialog     = new QWidget();
 	m_mainWidget    = new QWidget();
+
+	status      = new StatusIndicator(this);
+	status->setTitle(tr("Calendar"));
 
 	stackedWidget = new QStackedWidget();
 	stackedWidget->addWidget(m_configDialog);
@@ -28,8 +30,6 @@ Calendar::Calendar(QWidget *parent)
 	mainLayout->addWidget(stackedWidget, 10);
 	mainLayout->setSpacing(0);
 	m_mainWidget->setLayout(mainLayout);
-
-	status->setTitle(tr("Calendar"));
 
 	urlscheme = new QLineEdit();
 	hostname = new QLineEdit();
@@ -55,11 +55,12 @@ Calendar::Calendar(QWidget *parent)
 	checkSettings();
 
 	// context menu
-	QAction *configuration = new QAction(tr("Settings"), this);
-	QAction *netSettings = new QAction(tr("Network"), this);
-	QAction *calendar = new QAction(tr("Calendar"), this);
-	QAction *updateCal = new QAction("Update Calendar", this);
+	//QAction *configuration = new QAction(tr("Settings"), this);
+	//QAction *netSettings = new QAction(tr("Network"), this);
+	//QAction *calendar = new QAction(tr("Calendar"), this);
+	//QAction *updateCal = new QAction("Update Calendar", this);
 
+/*
 #ifdef Q_OS_SYMBIAN
 	menuBar()->addAction(configuration);
 	menuBar()->addAction(netSettings);
@@ -72,6 +73,9 @@ Calendar::Calendar(QWidget *parent)
 	//addAction(updateCal);
 	setContextMenuPolicy(Qt::ActionsContextMenu);
 #endif
+*/
+
+	setContextMenuPolicy(Qt::CustomContextMenu);
 
 	qDebug() << "[startup] setting up MVC architecture";
 
@@ -97,12 +101,9 @@ Calendar::Calendar(QWidget *parent)
 	connect(this, SIGNAL(visibleRow(int)),
 			m_events, SLOT(selectRow(int)));
 
-	connect(configuration, SIGNAL(triggered()), this, SLOT(configSettings()));
-	connect(netSettings, SIGNAL(triggered()), this, SLOT(configNetwork()));
-	connect(calendar, SIGNAL(triggered()), this, SLOT(viewUpdatedCalendar()));
-	connect(updateCal, SIGNAL(triggered()), this, SLOT(viewUpdatedCalendar()));
-        connect(this, SIGNAL(configChanged()),
-				this, SLOT(fetchCalendarData()));
+	//connect(updateCal, SIGNAL(triggered()), this, SLOT(viewUpdatedCalendar()));
+	connect(this, SIGNAL(configChanged()),
+			this, SLOT(fetchCalendarData()));
 
 	connect(saveSettingsBtn, SIGNAL(clicked()), this, SLOT(saveSettings()));
 	connect(abortSettingsBtn, SIGNAL(clicked()), this, SLOT(viewUpdatedCalendar()));
@@ -130,6 +131,20 @@ Calendar::Calendar(QWidget *parent)
 	getData();
 
 	setCentralWidget(m_mainWidget);
+
+	menu		= new ContextMenu(this);
+	menu->setVisible(false);
+
+	connect(this, SIGNAL(customContextMenuRequested(QPoint)),
+			menu, SLOT(show()));
+	connect(menu, SIGNAL(requestSettings()),
+			this, SLOT(configSettings()));
+	connect(menu, SIGNAL(requestNetwork()),
+			this, SLOT(configNetwork()));
+	connect(menu, SIGNAL(requestCalendar()),
+			this, SLOT(viewUpdatedCalendar()));
+	connect(menu, SIGNAL(requestQuit()),
+			qApp, SLOT(quit()));
 }
 
 /**
@@ -502,7 +517,8 @@ void Calendar::viewCalendar()
 
 	if((!m_events->hasFocus())&&m_events->isVisible())
 		m_events->setFocus();
-		status->setTitle(tr("Calendar"));
+
+	status->setTitle(tr("Calendar"));
 }
 
 /**

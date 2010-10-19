@@ -12,7 +12,8 @@ SOURCES += main.cpp \
     eventmodel.cpp \
 	eventdelegate.cpp\
 	eventtableview.cpp \
-    statusindicator.cpp
+    statusindicator.cpp \
+    contextmenu.cpp
 HEADERS += calendar.h \
     vcalparser.h \
     task.h \
@@ -21,7 +22,8 @@ HEADERS += calendar.h \
     eventmodel.h \
 	eventdelegate.h \
 	eventtableview.h \
-    statusindicator.h
+    statusindicator.h \
+    contextmenu.h
 FORMS += 
 QT += network
 

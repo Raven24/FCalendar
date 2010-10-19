@@ -7,20 +7,46 @@ int main(int argc, char *argv[])
 	a.setApplicationName("FCalendar");
 	a.setOrganizationName("FCalendar");
     Calendar w;
-	QString style = "EventTableView{"
-					"	alternate-background-color: #EEEEEE;"
-					"	background-color: #FFFFFF;"
-					"	gridline-color: #EEEEEE;"
-					"	color: #222222;"
-					"}"
-
-					"Calendar {"
+	QString style = "Calendar {"
 					"	background-color: #FEFEFE;"
+					"   color: #111;"
 					"}"
 
 					"StatusIndicator {"
 					"	margin: 0;"
 					"	padding: 0;"
+					"}"
+
+					"StatusIndicator QLabel {"
+					"	color: #111;"
+					"}"
+
+					"ContextMenu {"
+					"	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #BBB, stop: 1 #888);"
+					"}"
+
+					"ContextMenu QPushButton {"
+					"	border: none;"
+					"	border-radius: 3px;"
+					"	padding: 5px;"
+					"	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #888, stop: 1 #AAA);"
+					"}"
+
+					"ContextMenu QPushButton:default {"
+					"	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #333, stop: 1 #777);"
+					"}"
+
+					"EventTableView{"
+					"	gridline-color: #EEE;"
+					"	color: #222;"
+					"}"
+
+					"EventTableView::item {"
+					"	background-color: #FFF;"
+					"}"
+
+					"EventTableView::item:alternate {"
+					"	background-color: #EEE;"
 					"}"
 
 					"EventTableView::item:hover {"

@@ -11,6 +11,7 @@
 #include "ttodo.h"
 #include "eventdelegate.h"
 #include "statusindicator.h"
+#include "contextmenu.h"
 
 #ifndef CALENDAR_H
 #define CALENDAR_H
@@ -74,11 +75,12 @@ private:
 	int m_nextItemRow;
 	int m_currentEventRow;
 	int authRetries;
-        QWidget *m_configDialog, *m_netDialog, *m_mainWidget;
+	QWidget *m_configDialog, *m_netDialog, *m_mainWidget;
 	QLineEdit *urlscheme, *hostname, *port, *path, *username, *password, *proxyHost, *proxyPort;
 	QPushButton *saveSettingsBtn, *saveNetworkBtn, *abortSettingsBtn, *abortNetworkBtn;
 	QCheckBox *useProxy, *useTodos;
-        StatusIndicator *status;
+	StatusIndicator *status;
+	ContextMenu *menu;
 	
 #ifdef Q_OS_SYMBIAN
 	bool bDefaultIapSet;
