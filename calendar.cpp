@@ -60,11 +60,9 @@ Calendar::Calendar(QWidget *parent)
 	//QAction *calendar = new QAction(tr("Calendar"), this);
 	//QAction *updateCal = new QAction("Update Calendar", this);
 
-/*
-#ifdef Q_OS_SYMBIAN
-	menuBar()->addAction(configuration);
-	menuBar()->addAction(netSettings);
-	menuBar()->addAction(calendar);
+/*	//menuBar()->addAction(configuration);
+	//menuBar()->addAction(netSettings);
+	//menuBar()->addAction(calendar);
 	//menuBar()->addAction(updateCal);
 #else
 	addAction(configuration);
@@ -72,7 +70,6 @@ Calendar::Calendar(QWidget *parent)
 	addAction(calendar);
 	//addAction(updateCal);
 	setContextMenuPolicy(Qt::ActionsContextMenu);
-#endif
 */
 
 	setContextMenuPolicy(Qt::CustomContextMenu);
@@ -145,6 +142,14 @@ Calendar::Calendar(QWidget *parent)
 			this, SLOT(viewUpdatedCalendar()));
 	connect(menu, SIGNAL(requestQuit()),
 			qApp, SLOT(quit()));
+
+#ifdef Q_OS_SYMBIAN
+	Qt::WindowFlags flags = windowFlags();
+	flags |= Qt::WindowSoftkeysVisibleHint;
+	flags &= ~Qt::WindowSoftkeysRespondHint;
+	setWindowFlags(flags);
+#endif
+
 }
 
 /**

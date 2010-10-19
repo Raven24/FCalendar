@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_SYMBIAN
 	w.showFullScreen();
+	//w.showMaximized();
 #else
 	w.show();
 #endif
