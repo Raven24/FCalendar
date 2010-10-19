@@ -7,20 +7,31 @@ int main(int argc, char *argv[])
 	a.setApplicationName("FCalendar");
 	a.setOrganizationName("FCalendar");
     Calendar w;
-	QString style = "EventTableView{"
-					"	alternate-background-color: #EEEEEE;"
-					"	background-color: #FFFFFF;"
-					"	gridline-color: #EEEEEE;"
-					"	color: #222222;"
-					"}"
-
-					"Calendar {"
+	QString style = "Calendar {"
 					"	background-color: #FEFEFE;"
+					"   color: #111111;"
 					"}"
 
 					"StatusIndicator {"
 					"	margin: 0;"
 					"	padding: 0;"
+					"}"
+
+					"StatusIndicator QLabel {"
+					"	color: #111111;"
+					"}"
+
+					"EventTableView{"
+					"	gridline-color: #EEEEEE;"
+					"	color: #222222;"
+					"}"
+
+					"EventTableView::item {"
+					"	background-color: #FFFFFF;"
+					"}"
+
+					"EventTableView::item:alternate {"
+					"	background-color: #EEEEEE;"
 					"}"
 
 					"EventTableView::item:hover {"
