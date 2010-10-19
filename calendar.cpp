@@ -30,6 +30,7 @@ Calendar::Calendar(QWidget *parent)
 	mainLayout->addWidget(stackedWidget, 10);
 	mainLayout->setSpacing(0);
 	m_mainWidget->setLayout(mainLayout);
+	m_mainWidget->setContextMenuPolicy(Qt::NoContextMenu);
 
 	urlscheme = new QLineEdit();
 	hostname = new QLineEdit();
@@ -148,6 +149,12 @@ Calendar::Calendar(QWidget *parent)
 	flags |= Qt::WindowSoftkeysVisibleHint;
 	flags &= ~Qt::WindowSoftkeysRespondHint;
 	setWindowFlags(flags);
+
+	QAction *menuAction = new QAction(tr("Options"), this);
+	menuAction->setSoftKeyRole(QAction::PositiveSoftKey);
+	m_mainWidget->addAction(menuAction);
+	connect(menuAction, SIGNAL(triggered()),
+			menu, SLOT(show()));
 #endif
 
 }
