@@ -60,7 +60,7 @@ void ContextMenu::show() {
 	QPropertyAnimation *animation = new QPropertyAnimation(this, "geometry");
 	animation->setDuration(170);
 	animation->setStartValue(QRect(0, parentWidget()->size().height(), parentWidget()->size().width(), 0));
-	animation->setEndValue(QRect(0, parentWidget()->size().height()-34, parentWidget()->size().width(), 34));
+	animation->setEndValue(QRect(0, parentWidget()->size().height()-42, parentWidget()->size().width(), 42));
 
 	animation->start();
 

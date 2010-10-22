@@ -130,6 +130,8 @@ Calendar::Calendar(QWidget *parent)
 
 	setCentralWidget(m_mainWidget);
 
+	qDebug() << "[startup] initializing menu";
+
 	menu		= new ContextMenu(this);
 	menu->setVisible(false);
 

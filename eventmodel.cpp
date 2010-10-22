@@ -56,7 +56,7 @@ QVariant EventModel::headerData(int section, Qt::Orientation /* orientation */, 
 	 }
 	//qDebug() << "header data requested: \n\tsection: " << section << "\n\trole: " << role;
 	switch(section) {
-		case 0: return QString("Name");
+		case 0: return QString("Event");
 		case 1: return QString("Time");
 		default: return QVariant();
 
