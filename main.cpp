@@ -42,11 +42,17 @@ int main(int argc, char *argv[])
 
 					"EventTableView QHeaderView {"
 					"	padding: 0;"
-					"	border: none;"
+					"	margin: 0;"
+					"}"
+
+					"EventTableView QHeaderView::section {"
 					"	font-size: 9px;"
 					"	font-weight: bold;"
 					"	color: #EEE;"
 					"	background-color: #888;"
+					"	padding-left: 4px;"
+					"	border: none;"
+					"	border-bottom: 1px solid #9A9A9A;"
 					"}"
 
 					"EventTableView {"
