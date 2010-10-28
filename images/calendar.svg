@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created using Karbon14, part of koffice: http://www.koffice.org/karbon -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="595.277pt"
+   height="841.891pt"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="calendar.svg">
+  <metadata
+     id="metadata17">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1274"
+     inkscape:window-height="792"
+     id="namedview15"
+     showgrid="false"
+     inkscape:zoom="2.89"
+     inkscape:cx="382.07637"
+     inkscape:cy="571.1257"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" />
+  <defs
+     id="defs4">
+    <linearGradient
+       id="defitem6"
+       gradientUnits="userSpaceOnUse"
+       x1="18.947952"
+       y1="-2.2265308"
+       x2="53.066456"
+       y2="71.145233"
+       spreadMethod="pad"
+       gradientTransform="scale(2.0008276,0.49979318)">
+      <stop
+         stop-color="#000000"
+         offset="0"
+         stop-opacity="1"
+         id="stop7" />
+      <stop
+         stop-color="#ffffff"
+         offset="1"
+         stop-opacity="1"
+         id="stop9"
+         style="stop-color:#c8c8c8;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#defitem6"
+       id="linearGradient3770"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(2.0008276,0,0,0.49979318,336.097,408.8)"
+       spreadMethod="pad"
+       x1="18.947952"
+       y1="-2.2265308"
+       x2="53.066456"
+       y2="71.145233" />
+  </defs>
+  <path
+     style="fill:#fafafa;fill-rule:evenodd;stroke:#c3c3c3;stroke-width:1.25;stroke-linecap:square;stroke-linejoin:bevel"
+     inkscape:connector-curvature="0"
+     d="m 336.76,409.01665 0,158.48635 141.901,0 c 0,-53.061 0,-106.1221 0,-159.183 z"
+     id="defitem4"
+     inkscape:export-filename="/home/gwd/staudacher/calendar.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90" />
+  <path
+     inkscape:connector-curvature="0"
+     style="opacity:0.15;fill:url(#linearGradient3770);fill-rule:evenodd;stroke:#dcdcdc;stroke-width:1.25;stroke-linecap:square;stroke-linejoin:bevel"
+     d="m 336.097,443.489 c 47.5416,0 95.0832,0 142.625,0 l 0,-34.689 -141.96209,0.21754 z"
+     id="defitem5"
+     inkscape:export-filename="/home/gwd/staudacher/calendar.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90" />
+  <g
+     style="fill:none"
+     transform="translate(350.681,456.084)"
+     id="defitem7" />
+  <text
+     xml:space="preserve"
+     style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#3c3c3c;fill-opacity:1;stroke:none;font-family:Sans"
+     x="344.38202"
+     y="537.19525"
+     id="text2994"
+     sodipodi:linespacing="125%"
+     inkscape:export-filename="/home/gwd/staudacher/calendar.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90"><tspan
+       sodipodi:role="line"
+       id="tspan2996"
+       x="344.38202"
+       y="537.19525"
+       style="font-size:100px;fill:#3c3c3c;fill-opacity:1">30</tspan></text>
+  <path
+     style="fill:none;stroke:#c3c3c3;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 336.58537,443.09548 141.95122,0"
+     id="path3766"
+     inkscape:connector-curvature="0"
+     inkscape:export-filename="/home/gwd/staudacher/calendar.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90" />
+</svg>
