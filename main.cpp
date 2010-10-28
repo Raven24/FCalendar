@@ -50,9 +50,9 @@ int main(int argc, char *argv[])
 					"	font-weight: bold;"
 					"	color: #EEE;"
 					"	background-color: #888;"
-					"	padding-left: 4px;"
+					"	padding: 4px;"
 					"	border: none;"
-					"	border-bottom: 1px solid #9A9A9A;"
+					"	border-bottom: 1px solid #AAA;"
 					"}"
 
 					"EventTableView {"
