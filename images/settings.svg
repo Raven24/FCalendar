@@ -1,63 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created using Karbon14, part of koffice: http://www.koffice.org/karbon -->
 
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="595.277pt"
-   height="841.891pt"
-   id="svg2"
-   version="1.1"
-   inkscape:version="0.48.0 r9654"
-   sodipodi:docname="settings.svg">
-  <metadata
-     id="metadata11">
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="595.277pt" height="841.891pt" id="svg2" version="1.1" inkscape:version="0.48.0 r9654" sodipodi:docname="settings.svg">
+  <metadata id="metadata11">
     <rdf:RDF>
-      <cc:Work
-         rdf:about="">
+      <cc:Work rdf:about="">
         <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
         <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1249"
-     inkscape:window-height="685"
-     id="namedview9"
-     showgrid="true"
-     inkscape:zoom="2.2"
-     inkscape:cx="421.74334"
-     inkscape:cy="526.18188"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg2">
-    <inkscape:grid
-       type="xygrid"
-       id="grid2988" />
+  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="1249" inkscape:window-height="685" id="namedview9" showgrid="true" inkscape:zoom="2.2" inkscape:cx="421.74334" inkscape:cy="526.18188" inkscape:window-x="0" inkscape:window-y="28" inkscape:window-maximized="0" inkscape:current-layer="svg2">
+    <inkscape:grid type="xygrid" id="grid2988" />
   </sodipodi:namedview>
-  <defs
-     id="defs4" />
-  <path
-     style="fill:#f8f8f8;fill-rule:evenodd;stroke:#dcdcdc;stroke-width:1.25;stroke-linecap:square;stroke-linejoin:bevel"
-     d="M 425.15625 425.09375 L 425.15625 451.40625 C 414.52845 451.08395 405.0238 454.134 395.625 457.5 L 386.25 433.59375 C 373.5532 438.19847 361.8325 446.7504 350.375 456.3125 L 369.375 475.3125 C 362.1751 482.1751 357.2428 491.3053 352.5 500.625 L 327.65625 490.3125 C 322.57116 503.9063 320.59447 517.50035 319.21875 531.09375 L 346.875 531.09375 C 346.5775 540.93775 349.0694 550.781 352.5 560.625 L 327.1875 570.46875 C 332.43538 583.98375 340.89505 595.35925 349.84375 606.40625 L 369.375 586.875 C 376.4847 594.882 385.56735 599.93075 395.15625 604.21875 L 384.375 629.0625 C 399.8299 634.9845 413.10335 636.53725 426.09375 637.53125 L 426.09375 610.78125 C 437.21275 611.93725 447.006 609.7805 455.625 604.6875 L 465.9375 630 C 478.1935 624.726 489.869 617.0855 500.875 606.8125 L 482.34375 588.28125 C 490.59375 580.42125 496.90125 572.07675 500.15625 562.96875 L 524.0625 573.28125 C 529.3395 559.21825 534.1495 545.15675 532.0625 531.09375 L 506.71875 531.09375 C 506.64575 519.89295 504.91575 509.79565 501.09375 501.09375 L 525 491.71875 C 518.854 478.97135 511.964 466.5886 500.875 456.3125 L 482.8125 474.375 C 475.2565 467.4267 467.513 460.7626 457.5 457.5 L 466.40625 434.0625 C 454.43925 428.69429 440.87225 425.46441 425.15625 425.09375 z M 425.875 485.09375 C 451.67533 485.09375 472.5625 505.98092 472.5625 531.78125 C 472.5625 557.58158 451.67533 578.5 425.875 578.5 C 400.07468 578.5 379.15625 557.58158 379.15625 531.78125 C 379.15625 505.98092 400.07468 485.09375 425.875 485.09375 z "
-     id="defitem9"
-     inkscape:export-filename="/home/gwd/staudacher/settings.png"
-     inkscape:export-xdpi="90"
-     inkscape:export-ydpi="90" />
+  <defs id="defs4" />
+  <path style="fill:#f8f8f8;fill-rule:evenodd;stroke:#dcdcdc;stroke-width:1.25;stroke-linecap:square;stroke-linejoin:bevel" d="M 425.15625 425.09375 L 425.15625 451.40625 C 414.52845 451.08395 405.0238 454.134 395.625 457.5 L 386.25 433.59375 C 373.5532 438.19847 361.8325 446.7504 350.375 456.3125 L 369.375 475.3125 C 362.1751 482.1751 357.2428 491.3053 352.5 500.625 L 327.65625 490.3125 C 322.57116 503.9063 320.59447 517.50035 319.21875 531.09375 L 346.875 531.09375 C 346.5775 540.93775 349.0694 550.781 352.5 560.625 L 327.1875 570.46875 C 332.43538 583.98375 340.89505 595.35925 349.84375 606.40625 L 369.375 586.875 C 376.4847 594.882 385.56735 599.93075 395.15625 604.21875 L 384.375 629.0625 C 399.8299 634.9845 413.10335 636.53725 426.09375 637.53125 L 426.09375 610.78125 C 437.21275 611.93725 447.006 609.7805 455.625 604.6875 L 465.9375 630 C 478.1935 624.726 489.869 617.0855 500.875 606.8125 L 482.34375 588.28125 C 490.59375 580.42125 496.90125 572.07675 500.15625 562.96875 L 524.0625 573.28125 C 529.3395 559.21825 534.1495 545.15675 532.0625 531.09375 L 506.71875 531.09375 C 506.64575 519.89295 504.91575 509.79565 501.09375 501.09375 L 525 491.71875 C 518.854 478.97135 511.964 466.5886 500.875 456.3125 L 482.8125 474.375 C 475.2565 467.4267 467.513 460.7626 457.5 457.5 L 466.40625 434.0625 C 454.43925 428.69429 440.87225 425.46441 425.15625 425.09375 z M 425.875 485.09375 C 451.67533 485.09375 472.5625 505.98092 472.5625 531.78125 C 472.5625 557.58158 451.67533 578.5 425.875 578.5 C 400.07468 578.5 379.15625 557.58158 379.15625 531.78125 C 379.15625 505.98092 400.07468 485.09375 425.875 485.09375 z " id="defitem9" inkscape:export-filename="/home/florian/src/FCalendar/images/settings.png" inkscape:export-xdpi="83.876778" inkscape:export-ydpi="83.876778" />
 </svg>
