@@ -135,13 +135,13 @@ Calendar::Calendar(QWidget *parent)
 	setWindowFlags(flags);
 
 	QAction *menuAction = new QAction(tr("Options"), this);
-	menuAction->setSoftKeyRole(QAction::PositiveSoftKey);
+	menuAction->setSoftKeyRole(QAction::NegativeSoftKey);
 	m_mainWidget->addAction(menuAction);
 	connect(menuAction, SIGNAL(triggered()),
 			menu, SLOT(show()));
 
 	QAction *cancelAction = new QAction(tr("Cancel"), menu);
-	cancelAction->setSoftKeyRole(QAction::PositiveSoftKey);
+	cancelAction->setSoftKeyRole(QAction::NegativeSoftKey);
 	menu->addAction(cancelAction);
 	connect(cancelAction, SIGNAL(triggered()),
 			menu, SLOT(reject()));
