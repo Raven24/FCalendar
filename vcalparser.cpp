@@ -55,12 +55,12 @@ QList<QMap <QString, QString> > VCalParser::split(QString type)
 void VCalParser::getEvents()
 {
 	qDebug() << "[calendar] parsing events";
-	//QTime time;
+    //QTime time;
 
 	QList<QMap<QString, QString> > eventList = split("VEVENT");
 	nextEvent.setStart(QDateTime::currentDateTime().addYears(100));
 
-	//time.start();
+    //time.start();
 	QList<QMap<QString, QString> >::const_iterator i;
 	for (i = eventList.constBegin(); i != eventList.constEnd(); ++i) {
 
@@ -93,7 +93,7 @@ void VCalParser::getEvents()
 		}
 		m_events.append(event);
 	}
-	//qDebug() << "[debug] parsing events took: " << time.elapsed();
+    //qDebug() << "[debug] parsing events took: " << time.elapsed() << "ms";
 
 	qSort(m_events);
 

@@ -38,7 +38,7 @@ void TEvent::setNextItem(const bool isNext)
 	m_nextItem = isNext;
 }
 
-QDateTime TEvent::getStart()
+QDateTime TEvent::getStart() const
 {
 	return m_start;
 }
@@ -130,18 +130,10 @@ bool TEvent::isNextItem()
 
 bool TEvent::operator<(const TEvent &other) const
 {
-	TEvent tmp = other;
-	if(m_start < tmp.getStart()) {
-		return true;
-	}
-	return false;
+    return m_start < other.getStart();
 }
 
 bool TEvent::operator==(const TEvent &other) const
 {
-	TEvent tmp = other;
-	if(m_start == tmp.getStart()) {
-		return true;
-	}
-	return false;
+    return m_start == other.getStart();
 }

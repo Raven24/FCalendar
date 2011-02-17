@@ -17,7 +17,7 @@ public:
 	void setEnd(const QDateTime end);
 	void setNextItem(const bool isNext);
 
-	QDateTime	getStart();
+    QDateTime	getStart() const;
 	QDateTime	getEnd();
 	QString     getStartString();
 	QString		getRemaining();

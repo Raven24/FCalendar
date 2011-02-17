@@ -13,6 +13,7 @@ void EventModel::fetchData(VCalParser *parser)
 {
 	modelData = parser->m_events;
 	reset();
+    qDebug() << "[info] there are" << modelData.size() << "events";
 }
 
 int EventModel::rowCount(const QModelIndex & /* parent */) const

@@ -4,7 +4,10 @@
 
 EventTableView::EventTableView()
 {
-	setShowGrid(false);
+    setShowGrid(false);
+    setSelectionMode(QAbstractItemView::SingleSelection);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+
 }
 
 QModelIndex EventTableView::moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) 
