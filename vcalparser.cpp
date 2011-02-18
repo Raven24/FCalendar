@@ -16,99 +16,88 @@ VCalParser::VCalParser()
 VCalParser::VCalParser(QString *vcaldata):
 		m_rawData(vcaldata)
 {
-	getEvents();
-	getTodos();
-}
-
-QList<QMap <QString, QString> > VCalParser::split()
-{
-	return split("VEVENT");
-}
-
-QList<QMap <QString, QString> > VCalParser::split(QString type)
-{
-	//QTime time;
-	QStringList lines = m_rawData->split(QRegExp("\n"), QString::SkipEmptyParts);
-	QStringList::const_iterator i;
-	QList<QMap <QString, QString> > itemsList;
-	QMap<QString, QString> temp;
-
-	//time.start();
-	for (i = lines.constBegin(); i != lines.constEnd(); ++i) {
-		if ((*i).contains("BEGIN:" + type)) {
-			// make a clean list for the new event
-			temp.clear();
-		}
-		if(!(*i).startsWith(" ") && (*i).contains(":")) {
-			temp[(*i).split(":").at(0)] = (*i).split(":").at(1);
-		}
-		if ((*i).contains("END:" + type)) {
-			// event is over, append to itemsList
-			itemsList.append(temp);
-		}
-
-	}
-	//qDebug() << "[debug] splitting took: " << time.elapsed();
-	return itemsList;
-}
-
-void VCalParser::getEvents()
-{
-	qDebug() << "[calendar] parsing events";
-	//QTime time;
-
-	QList<QMap<QString, QString> > eventList = split("VEVENT");
 	nextEvent.setStart(QDateTime::currentDateTime().addYears(100));
+	atEnd = false;
+	read();
+}
 
-	//time.start();
-	QList<QMap<QString, QString> >::const_iterator i;
-	for (i = eventList.constBegin(); i != eventList.constEnd(); ++i) {
+void VCalParser::read()
+{
+	QString tmp;
+	i = m_rawData->constBegin();
 
-		TEvent event;
-		event.setUid((*i).value("UID"));
-		event.setDescription((*i).value("DESCRIPTION"));
-		event.setSummary((*i).value("SUMMARY"));
-		event.setLocation((*i).value("LOCATION"));
-		// start date
-		if ((*i).value("DTSTART").size() > 1) {
-			event.setStart(decodeDate((*i).value("DTSTART")));
-		} else if ((*i).value("DTSTART;VALUE=DATE").size() > 1) {
-			event.setStart(decodeDate((*i).value("DTSTART;VALUE=DATE")));
-		}
-		// end date
-		if ((*i).value("DTEND").size() > 1) {
-			event.setEnd(decodeDate((*i).value("DTEND")));
-		} else if ((*i).value("DTEND;VALUE=DATE").size() > 1) {
-			event.setEnd(decodeDate((*i).value("DTEND;VALUE=DATE")));
-		}
-		event.setLastModified(decodeDate((*i).value("LAST-MODIFIED")));
-		event.setClass((*i).value("CLASS"));
-		event.setStatus((*i).value("STATUS"));
+	while(i != m_rawData->constEnd()) {
+		i++;
 
-		// event is in the future
-		if(event.getStart() > QDateTime::currentDateTime()) {
-			if(event < nextEvent) {
-				nextEvent = event;
-			}
+		// read until the next newline
+		tmp = readLine();
+
+		if( tmp == "BEGIN:VEVENT" && !atEnd ) {
+			readEvent();
 		}
-		m_events.append(event);
+
+		if( tmp == "BEGIN:VTODO" && !atEnd ) {
+			readTodo();
+		}
+
+		if( tmp == "END:VCALENDAR" || atEnd ) {
+			break;
+		}
+
+		tmp.clear();
 	}
-	//qDebug() << "[debug] parsing events took: " << time.elapsed();
 
 	qSort(m_events);
 
 	if(nextEvent.isValid()) {
 		nextEventIndex = m_events.indexOf(nextEvent);
 	} else {
-		// there seems to be no reasonable event in the near future
+		// there seems to be no valid event in the near future
 		nextEventIndex = m_events.size()-1;
 	}
 }
 
-void VCalParser::getTodos()
+void VCalParser::readEvent()
 {
-	qDebug() << "[calendar] parsing todos";
-	QList<QMap<QString, QString> > todoList = split("VTODO");
+	//qDebug() << "[calendar] reading event";
+	//QTime time;
+
+	QString key, val;
+	TEvent event;
+
+	//time.start();
+	while( key != "END" && !atEnd ) {
+		key = readKey();
+		val = readValue();
+
+		if( key == "UID" )				event.setUid(val);
+		else if( key == "DESCRIPTION")  event.setDescription(val);
+		else if( key == "SUMMARY")      event.setSummary(val);
+		else if( key == "LOCATION")     event.setLocation(val);
+		else if( key == "LAST-MODIFIED")event.setLastModified(decodeDate(val));
+		else if( key == "CLASS")        event.setClass(val);
+		else if( key == "STATUS")       event.setStatus(val);
+		else if( key == "DTSTART" ||
+				 key == "DTSTART;VALUE=DATE") {
+			if( val.size() > 1 )		event.setStart(decodeDate(val));
+		} else if( key == "DTEND" ||
+				   key == "DTEND;VALUE=DATE") {
+			if( val.size() > 1 )		event.setEnd(decodeDate(val));
+		}
+
+		// event is in the future
+		if(event.getStart() > QDateTime::currentDateTime()) {
+			if(event < nextEvent) nextEvent = event;
+		}
+	}
+
+	m_events.append(event);
+}
+
+void VCalParser::readTodo()
+{
+	/*qDebug() << "[calendar] reading todo";
+	//QList<QMap<QString, QString> > todoList = split("VTODO");
 
 	QList<QMap<QString, QString> >::const_iterator i;
 	for (i = todoList.constBegin(); i != todoList.constEnd(); ++i) {
@@ -123,7 +112,7 @@ void VCalParser::getTodos()
 		todo.setStatus((*i).value("STATUS"));
 
 		m_todos.append(todo);
-	}
+	}*/
 }
 
 /**
@@ -135,4 +124,47 @@ QDateTime VCalParser::decodeDate(QString date)
 		return QDateTime::fromString(date, "yyyyMMdd");
 	}
 	return QDateTime::fromString(date, "yyyyMMddThhmmssZ");
+}
+
+/**
+ * read one line from input
+ */
+const QString VCalParser::readLine()
+{
+	QString tmp;
+
+	while( (*i) != '\n' && !atEnd ) {
+		tmp += (*i);
+		++i;
+		if ( i == m_rawData->constEnd() ) atEnd = true;
+	}
+	return tmp;
+}
+
+/**
+ * read the name of the property
+ */
+const QString VCalParser::readKey()
+{
+	QString tmp;
+
+	while( (*i) != ':' && !atEnd ) {
+		if( (*i) != '\n' ) tmp += (*i);
+		++i;
+		if ( i == m_rawData->constEnd() ) atEnd = true;
+	}
+	return tmp;
+}
+
+/**
+ * read the value of the property
+ * if the following line contains a space as first char,
+ * then the value continues
+ */
+const QString VCalParser::readValue()
+{
+	QString tmp = readLine();
+	if( tmp.startsWith(":") )
+		tmp.remove(0, 1);
+	return tmp;
 }

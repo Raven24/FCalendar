@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 					"EventTableView::item:selected:active{"
 					"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #d9e2f1, stop: 1 #c3d1e6);"
 					"}";
-	a.setStyleSheet(style);
+        a.setStyleSheet(style);
 
 #ifdef Q_OS_SYMBIAN
 	w.showFullScreen();

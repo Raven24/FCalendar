@@ -19,21 +19,26 @@ public:
     VCalParser();
 	VCalParser(QString *vcaldata);
 
-	void getEvents();
-	void getTodos();
-
-	QList<TEvent>	m_events;
+    QList<TEvent>	m_events;
 	QList<TTodo>	m_todos;
 	QDateTime		decodeDate(QString date);
 	int				nextEventIndex;
 	TEvent			nextEvent;
 
+protected:
+    void readEvent();
+    void readTodo();
+
 private:
-	QList<QMap <QString, QString> > split();
-	QList<QMap <QString, QString> > split(QString type);
+    void read();
+    const QString readLine();
+    const QString readKey();
+    const QString readValue();
 
 	QString		*m_rawData;
 	QStringList *m_rawTasks;
+    QString::const_iterator i;
+    bool        atEnd;
 };
 
 #endif // VCALPARSER_H

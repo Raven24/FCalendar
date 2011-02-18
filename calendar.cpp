@@ -23,12 +23,13 @@ Calendar::Calendar(QWidget *parent)
 	stackedWidget = new QStackedWidget();
 	stackedWidget->addWidget(m_configDialog);
 	stackedWidget->addWidget(m_netDialog);
-	stackedWidget->addWidget(m_tabs);
+        stackedWidget->addWidget(m_tabs);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	mainLayout->addWidget(status, 1);
 	mainLayout->addWidget(stackedWidget, 10);
 	mainLayout->setSpacing(0);
+        mainLayout->setMargin(0);
 	m_mainWidget->setLayout(mainLayout);
 	m_mainWidget->setContextMenuPolicy(Qt::NoContextMenu);
 
@@ -89,9 +90,6 @@ Calendar::Calendar(QWidget *parent)
 	connect(abortSettingsBtn, SIGNAL(clicked()), this, SLOT(viewUpdatedCalendar()));
 	connect(saveNetworkBtn, SIGNAL(clicked()), this, SLOT(saveSettings()));
 	connect(abortNetworkBtn, SIGNAL(clicked()), this, SLOT(viewUpdatedCalendar()));
-
-	m_events->setSelectionMode(QAbstractItemView::SingleSelection);
-	m_events->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	m_todos->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_todos->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -172,13 +170,21 @@ void Calendar::populateList()
 		QString line = data.readLine();
 		response.append(line).append("\n");
 	}
-	response = data.codec()->toUnicode(response.toAscii());
-	parser = new VCalParser(&response);
 
+    QTime time;
+    time.start();
+	response = data.codec()->toUnicode(response.toAscii());
+    parser = new VCalParser(&response);
 	eventModel->fetchData(parser);
-	m_events->resizeRowsToContents();
+    qDebug() << "[debug] handling data took" << time.elapsed() << "ms";
+
+    time.restart();
+    m_events->resizeRowsToContents();
+    m_events->horizontalHeader()->resizeSection(1, 55);
+    qDebug() << "[debug] resizing rows took" << time.elapsed() << "ms";
+
 	emit visibleRow(parser->nextEventIndex);
-		showEventInfo(m_events->currentIndex());
+    showEventInfo(m_events->currentIndex());
 	m_currentEventRow = parser->nextEventIndex;
 
 	/*for (int j = 0; j < parser->m_todos.size(); j++) {
@@ -306,7 +312,7 @@ void Calendar::saveCalendarData(QNetworkReply *reply)
 				this, SLOT(outputError(QNetworkReply::NetworkError)));
 
 	if(reply->error()) {
-		qDebug() << "Calendar::saveCalendarData() \n\tnetwork error";
+        qDebug() << "[error] Calendar::saveCalendarData() \n\tnetwork error";
 		int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 		if(code == 404) {
 			emit outputError(QString("404 - not found"));
@@ -317,8 +323,7 @@ void Calendar::saveCalendarData(QNetworkReply *reply)
 	}
 
 	//qDebug() << reply->header(QNetworkRequest::ContentTypeHeader);
-
-	QString response(reply->readAll());
+    QString response(reply->readAll());
 
 	data.seek(0);
 	data << response;

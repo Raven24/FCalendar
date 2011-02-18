@@ -17,10 +17,13 @@ signals:
 
 public slots:
 	void show();
+        void hide();
 
 protected:
 	QPushButton *calendar, *network, *settings, *quit;
 
+private slots:
+        void privHide();
 };
 
 #endif // CONTEXTMENU_H

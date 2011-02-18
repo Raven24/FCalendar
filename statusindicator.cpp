@@ -22,6 +22,7 @@ StatusIndicator::StatusIndicator(QWidget *parent) :
 	stackLayout->addWidget(progress);
 
 	QHBoxLayout *layout = new QHBoxLayout();
+        layout->setMargin(0);
 	layout->addLayout(stackLayout);
 	layout->addWidget(working);
 
