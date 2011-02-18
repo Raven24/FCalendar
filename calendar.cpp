@@ -308,9 +308,6 @@ void Calendar::saveCalendarData()
 
 void Calendar::saveCalendarData(QNetworkReply *reply)
 {
-	connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
-				this, SLOT(outputError(QNetworkReply::NetworkError)));
-
 	if(reply->error()) {
         qDebug() << "[error] Calendar::saveCalendarData() \n\tnetwork error";
 		int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
@@ -322,14 +319,12 @@ void Calendar::saveCalendarData(QNetworkReply *reply)
 		return;
 	}
 
-	//qDebug() << reply->header(QNetworkRequest::ContentTypeHeader);
-    QString response(reply->readAll());
+	qDebug() << "[info] new filesize: " << reply->size();
+	calendar.resize(reply->size());
 
-	data.seek(0);
-	data << response;
-	data.flush();
-	qDebug() << "[info] new filesize: " << response.length();
-	calendar.resize(response.length());
+	calendar.seek(0);
+	calendar.write(reply->readAll());
+	calendar.flush();
 
 	reply->deleteLater();
 
